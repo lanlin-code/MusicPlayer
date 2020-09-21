@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">music</string>
+    <string name="phone_number">手机号:</string>
+    <string name="password">密码:</string>
+    <string name="phone_hint">请输入手机号</string>
+    <string name="password_hint">请输入密码</string>
+    <string name="login">登录</string>
+    <string name="phone_login">手机登录</string>
+</resources>
