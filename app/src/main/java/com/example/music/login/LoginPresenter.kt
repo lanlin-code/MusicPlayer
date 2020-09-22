@@ -2,15 +2,18 @@ package com.example.music.login
 
 import com.example.music.ResponseCallback
 import com.example.music.entity.User
+import com.example.music.util.LogUtil
 import com.example.respository.RequestCallBack
 import com.example.respository.bean.UserJson
 
 class LoginPresenter : RequestCallBack<UserJson> {
 
-    var listener: LoginListener? = null
+    var listener: ResponseCallback<User>? = null
+    private val tag = "LoginPresenter"
 
     override fun callback(data: UserJson) {
         val u = User.of(data)
+        LogUtil.debug(tag, "$u")
         if (User.userMessageError(u)) {
             listener?.onError("Something is wrong, please try again")
         } else {
@@ -23,16 +26,5 @@ class LoginPresenter : RequestCallBack<UserJson> {
     }
 
 
-    fun getUsername(): String? {
-        return listener?.getUsername()
-    }
 
-    fun getPassword(): String? {
-        return listener?.getPassword()
-    }
-
-    interface LoginListener : ResponseCallback<User> {
-        fun getUsername(): String?
-        fun getPassword(): String?
-    }
 }

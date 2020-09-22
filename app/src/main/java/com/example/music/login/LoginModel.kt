@@ -2,18 +2,22 @@ package com.example.music.login
 
 import com.example.mylibrary.ApiImplement
 import com.example.mylibrary.LoginImplement
+import com.example.respository.RequestCallBack
+import com.example.respository.bean.UserJson
 
 class LoginModel {
 
 
-    fun login(presenter: LoginPresenter) {
-        val username = presenter.getUsername()
-        val password = presenter.getPassword()
+    fun login(callback: RequestCallBack<UserJson>, username: String?, password: String?) {
         if (username == null || password == null) {
-            presenter.error("username or password is null")
+            callback.error("username or password is null")
         } else {
-            ApiImplement.loginImp.login(username, password, presenter)
+            ApiImplement.loginImp.login(username, password, callback)
         }
+    }
+
+    fun autoLogin(callback: RequestCallBack<UserJson>) {
+        ApiImplement.loginImp.getLoginStatus(callback)
     }
 
 }

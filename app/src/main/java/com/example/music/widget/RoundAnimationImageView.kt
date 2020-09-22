@@ -71,6 +71,8 @@ class RoundAnimationImageView : androidx.appcompat.widget.AppCompatImageView {
         }
     }
 
+
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         val width = MeasureSpec.getSize(widthMeasureSpec)

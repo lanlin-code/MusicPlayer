@@ -6,4 +6,7 @@
     <string name="password_hint">请输入密码</string>
     <string name="login">登录</string>
     <string name="phone_login">手机登录</string>
+    <string name="logout">退出登录</string>
+    <string name="nickname">用户名:</string>
+    <string name="personal_message">个人信息</string>
 </resources>

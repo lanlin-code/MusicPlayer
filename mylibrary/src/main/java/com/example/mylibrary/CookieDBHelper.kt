@@ -17,6 +17,7 @@ class CookieDBHelper(
         private const val CREATE_TABLE = "create table cookie(name text, value text, domain text, path text, expires text, del Integer)"
         const val name = "cookieDatabase"
         const val version = 1
+        private val tag = "CookieDBHelper"
     }
 
     fun insert(cookie: Cookie) {
@@ -28,7 +29,7 @@ class CookieDBHelper(
 
     fun getCookies(): MutableList<Cookie> {
         val reader = this.readableDatabase
-        Log.d("main", "getCookie")
+        Log.d(tag, "getCookie")
         val list = mutableListOf<Cookie>()
         val c = reader.rawQuery("select * from cookie where del = ?", arrayOf("0"))
         if (c.moveToFirst()) {
@@ -38,10 +39,11 @@ class CookieDBHelper(
                 val domain = c.getString(c.getColumnIndex("domain"))
                 val path = c.getString(c.getColumnIndex("path"))
                 val expires = c.getLong(c.getColumnIndex("expires"))
-                val cookie = Cookie.Builder().domain(domain).name(name).value(value).path(path).expiresAt(expires).build()
+                val cookie = Cookie.Builder().name(name).value(value).expiresAt(expires).domain(domain).path(path).build()
                 list.add(cookie)
             } while (c.moveToNext())
         }
+        Log.d(tag, "$list")
         c.close()
         return list
     }

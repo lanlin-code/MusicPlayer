@@ -12,4 +12,8 @@ class UserJson {
         var nickname : String? = null
         var userId : Long? = null
     }
+
+    override fun toString(): String {
+        return "[UserJson] avatar = ${profile?.avatarUrl}, nickname = ${profile?.nickname}, userId = ${profile?.userId}"
+    }
 }

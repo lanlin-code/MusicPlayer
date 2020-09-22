@@ -31,10 +31,12 @@ class LoginImplement : ClientLoginApi {
             Log.d(tag, "getData")
             o.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    callback.callback(it)
                     Log.d(tag, "$it")
+                    callback.callback(it)
                 },
-                    { it.message?.let { it1 -> callback.error(it1) } })
+                    {
+                        it.message?.let { it1 -> callback.error(it1) }
+                    })
         } else {
             callback.error("Fail to request, please check whether username or password is null")
         }

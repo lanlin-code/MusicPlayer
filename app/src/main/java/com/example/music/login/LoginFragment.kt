@@ -7,16 +7,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import androidx.fragment.app.Fragment
-import com.example.music.R
+import com.example.music.*
 import com.example.music.entity.User
 
 
-class LoginFragment : Fragment(), LoginPresenter.LoginListener {
+class LoginFragment : BaseFragment(), ResponseCallback<User> {
 
     private var listener: LoginCallback? = null
     private var phone: EditText? = null
     private var password: EditText? = null
+//    private var fragmentChangeListener: FragmentChangeListener? = null
 
     private val presenter = LoginPresenter()
     private val model = LoginModel()
@@ -35,7 +37,9 @@ class LoginFragment : Fragment(), LoginPresenter.LoginListener {
         password = view.findViewById(R.id.password_text)
         presenter.listener = this
         val b = view.findViewById<Button>(R.id.login_button)
-        b.setOnClickListener { model.login(presenter) }
+        b.setOnClickListener { model.login(presenter, phone?.text.toString(), password?.text.toString()) }
+        val back = view.findViewById<ImageButton>(R.id.login_back_button)
+        back.setOnClickListener { fragmentChangeListener?.onBackHome() }
     }
 
     override fun onAttach(context: Context) {
@@ -43,6 +47,9 @@ class LoginFragment : Fragment(), LoginPresenter.LoginListener {
         if (context is LoginCallback) {
             listener = context
         }
+//        if (context is FragmentChangeListener) {
+//            fragmentChangeListener = context
+//        }
 
     }
 
@@ -51,13 +58,6 @@ class LoginFragment : Fragment(), LoginPresenter.LoginListener {
         listener = null
     }
 
-    override fun getUsername(): String? {
-        return phone?.text.toString()
-    }
-
-    override fun getPassword(): String? {
-        return password?.text.toString()
-    }
 
     override fun onSuccess(data: User) {
         listener?.onLoginSuccess(data)
@@ -67,8 +67,5 @@ class LoginFragment : Fragment(), LoginPresenter.LoginListener {
         listener?.onLoginFail(message)
     }
 
-    interface LoginCallback {
-        fun onLoginSuccess(data: User)
-        fun onLoginFail(message: String)
-    }
+
 }

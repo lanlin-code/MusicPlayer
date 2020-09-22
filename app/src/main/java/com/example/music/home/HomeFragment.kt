@@ -8,11 +8,16 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import com.example.music.FragmentChangeListener
+import com.example.music.MainActivity
 import com.example.music.R
 import com.example.music.login.LoginFragment
+import com.example.music.showUserStatus.ShowUserStatusFragment
+import com.squareup.picasso.Picasso
 
-class HomeFragment: Fragment() {
+class HomeFragment: Fragment(), MainActivity.OnLoginSuccessListener {
     private var listener: FragmentChangeListener? = null
+    private lateinit var avatar: ImageView
+    private var loginSuccess: Boolean = false
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -31,14 +36,23 @@ class HomeFragment: Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val avatar = view.findViewById<ImageView>(R.id.avatar_iv)
+        avatar = view.findViewById(R.id.avatar_iv)
         avatar.setOnClickListener {
-            listener?.onFragmentChange(LoginFragment())
+            if (!loginSuccess) {
+                listener?.onFragmentChange(LoginFragment())
+            } else {
+                listener?.onFragmentChange(ShowUserStatusFragment())
+            }
         }
     }
 
     override fun onDetach() {
         super.onDetach()
         listener = null
+    }
+
+    override fun onSuccess(avatarUrl: String, context: Context) {
+        loginSuccess = true
+        Picasso.with(context).load(avatarUrl).into(avatar)
     }
 }
