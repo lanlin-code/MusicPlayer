@@ -1,9 +1,9 @@
 package com.example.respository.bean
 
-class BannerJson{
+class BannerJson {
     var banners : MutableList<Banner>? = null
 
-    class Banner{
+    class Banner {
         var pic : String? = null
     }
 }

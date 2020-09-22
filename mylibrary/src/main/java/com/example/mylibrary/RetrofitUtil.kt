@@ -17,7 +17,7 @@ object RetrofitUtil {
     private val tag: String = "RetrofitUtil"
     private val retrofit = Retrofit.Builder().addCallAdapterFactory(RxJavaCallAdapterFactory.create())
         .addConverterFactory(GsonConverterFactory.create()).client(OkHttpClient()).
-        baseUrl("https://netease-api.aliyun.topviewclub.cn/").build()
+        baseUrl("http://47.102.203.97:3000/").build()
 
     fun init(context: Context) {
         val okHttpClient = OkHttpClient.Builder().connectTimeout(8000, TimeUnit.MILLISECONDS)
