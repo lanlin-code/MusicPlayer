@@ -9,4 +9,9 @@
     <string name="logout">退出登录</string>
     <string name="nickname">用户名:</string>
     <string name="personal_message">个人信息</string>
+    <string name="my_playlist">我的歌单</string>
+    <string name="play_all">播放全部</string>
+    <string name="playlist">歌单</string>
+    <string name="user">用户</string>
+    <string name="unknown">未知</string>
 </resources>

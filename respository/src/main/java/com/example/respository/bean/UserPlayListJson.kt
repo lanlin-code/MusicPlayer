@@ -7,9 +7,17 @@ package com.example.respository.bean
 class UserPlayListJson{
     var playlist : MutableList<PlayList>? = null
     
-    class PlayList{
+    class PlayList {
         var id : Long? = null
         var name : String? = null
         var coverImgUrl : String? = null
+
+        override fun toString(): String {
+            return "[Playlist id = $id, name = $name, coverImgUrl = $coverImgUrl]"
+        }
+    }
+
+    override fun toString(): String {
+        return "$playlist"
     }
 }

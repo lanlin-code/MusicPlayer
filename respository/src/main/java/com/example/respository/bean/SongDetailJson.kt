@@ -7,6 +7,10 @@ package com.example.respository.bean
 class SongDetailJson {
     var songs: MutableList<Song>? = null
 
+    override fun toString(): String {
+        return "songs is $songs"
+    }
+
     class Song {
         var name: String? = null
         var id: Long? = null
@@ -21,6 +25,10 @@ class SongDetailJson {
          * */
         var ar: MutableList<Artist>? = null
 
+        override fun toString(): String {
+            return "name is $name, id is $id, al is $al, ar is $ar"
+        }
+
         /**
          * 专辑的信息.
          * */
@@ -28,6 +36,10 @@ class SongDetailJson {
             var id: Long? = null
             var name: String? = null
             var picUrl: String? = null
+
+            override fun toString(): String {
+                return "id is $id, name is $name, picUrl is $picUrl"
+            }
         }
 
         /**
@@ -36,6 +48,9 @@ class SongDetailJson {
         class Artist {
             var id: Long? = null
             var name: String? = null
+            override fun toString(): String {
+                return "id is $id, name is $name"
+            }
         }
     }
 }

@@ -9,7 +9,9 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.music.autoLogin.AutoLoginFragment
+import com.example.music.entity.Song
 import com.example.music.entity.User
+import com.example.music.entity.UserPlaylist
 import com.example.music.home.HomeFragment
 import com.example.music.login.LoginFragment
 import com.example.music.login.LoginModel
@@ -17,18 +19,20 @@ import com.example.music.login.LoginPresenter
 import com.example.music.util.LogUtil
 import com.squareup.picasso.Picasso
 
-class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener, AutoLoginCallback, LoadStatusListener {
+class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener, AutoLoginCallback,
+    LoadStatusListener, LoadPlaylistListener, DataObtainListener, SongsListener {
 
     private lateinit var currentFragment: Fragment
     private var user: User = User()
     private val TAG: String = "MainActivity"
     private var loginSuccessListener: OnLoginSuccessListener? = null
+    private var userPlaylists: MutableList<UserPlaylist> = mutableListOf()
+    private var songs: MutableList<Song> = mutableListOf()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         val h = HomeFragment()
         currentFragment = h
         loginSuccessListener = h
@@ -78,13 +82,11 @@ class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener,
 
     private fun setHome() {
         val h = supportFragmentManager.findFragmentByTag(HomeFragment::class.java.simpleName)
-        LogUtil.debug("sethome", "before transaction")
         h?.let {
             supportFragmentManager.beginTransaction().hide(currentFragment).
             show(it).remove(currentFragment).commit()
             currentFragment = h
         }
-        LogUtil.debug("setHome", "End")
     }
 
     /**
@@ -132,7 +134,7 @@ class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener,
      */
     override fun onAutoLoginFail(message: String) {
         toastErrorMessage(message)
-       setHome()
+        setHome()
     }
 
     /**
@@ -143,5 +145,43 @@ class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener,
         val width = 200
         val height = 200
         Picasso.with(this.applicationContext).load(user.avatar).resize(width, height).into(imageView)
+    }
+
+    override fun onLoadPlaylistSuccess(playlists: MutableList<UserPlaylist>) {
+        userPlaylists = playlists
+    }
+
+
+    override fun onLoadPlaylistFail(message: String) {
+        toastErrorMessage(message)
+    }
+
+    override fun obtainUserId(): Long {
+        return user.userId
+    }
+
+    override fun obtainUserAvatar(): String {
+        return user.avatar
+    }
+
+    override fun obtainUsername(): String {
+        return user.nickname
+    }
+
+    override fun onFail(msg: String) {
+        toastErrorMessage(msg)
+    }
+
+    override fun transmitData(songs: MutableList<Song>) {
+        this.songs.clear()
+        this.songs.addAll(songs)
+    }
+
+    override fun playFrom(position: Int) {
+
+    }
+
+    override fun clearData() {
+        this.songs.clear()
     }
 }

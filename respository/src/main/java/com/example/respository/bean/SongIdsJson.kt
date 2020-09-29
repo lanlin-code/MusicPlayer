@@ -7,10 +7,10 @@ package com.example.respository.bean
 class SongIdsJson() {
     var playlist : PlayList? = null
     
-    class PlayList(){
+    class PlayList() {
         var trackIds : MutableList<TrackId>? = null
         
-        class TrackId(){
+        class TrackId() {
             var id : Long? = null
         }
     }
