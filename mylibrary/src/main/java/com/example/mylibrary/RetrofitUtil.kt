@@ -20,7 +20,7 @@ object RetrofitUtil {
         baseUrl("http://47.102.203.97:3000/").build()
 
     fun init(context: Context) {
-        val okHttpClient = OkHttpClient.Builder().connectTimeout(20000, TimeUnit.MILLISECONDS)
+        val okHttpClient = OkHttpClient.Builder().connectTimeout(8000, TimeUnit.MILLISECONDS)
             .cookieJar(object : CookieJar {
                 override fun saveFromResponse(url: HttpUrl, cookies: MutableList<Cookie>) {
                     val helper = CookieDBHelper(context.applicationContext, CookieDBHelper.name,

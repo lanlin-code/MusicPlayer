@@ -1,32 +1,48 @@
 package com.example.music.songs
 
-import com.example.music.FragmentChangeListener
+import android.widget.LinearLayout
 import com.example.music.ShowDataListener
 import com.example.music.SongsListener
 import com.example.music.entity.Song
-import com.example.music.util.LogUtil
 import com.example.music.util.PinYinUtil
 import com.example.music.widget.OuterRecyclerview
 
 class SongsShow(var outerRecyclerview: OuterRecyclerview? = null,
-                var listener: SongsListener? = null): ShowDataListener<MutableList<Song>> {
+                var listener: SongsListener? = null,
+                var playAll: LinearLayout? = null): ShowDataListener<MutableList<Song>> {
 
     override fun show(data: MutableList<Song>) {
+        val map = getData(data)
+        val t = mutableListOf<String>()
+        t.addAll(map.keys)
+        t.sort()
         outerRecyclerview?.let {
-            val map = getData(data)
-
-            val t = mutableListOf<String>()
-            t.addAll(map.keys)
-            t.sort()
+            it.title = t
             it.adapter = OuterAdapter(map, listener, t)
             it.adapter?.notifyDataSetChanged()
         }
+        playAll?.setOnClickListener {
+            val d = getSongs(map, t)
+            listener?.transmitData(d)
+            listener?.playFrom(0)
+        }
+    }
+
+    private fun getSongs(map: MutableMap<String, MutableList<Song>>, title: MutableList<String>): MutableList<Song> {
+        val songs = mutableListOf<Song>()
+        for (t in title) {
+            val s = map[t]
+            s?.let {
+                songs.addAll(s)
+            }
+        }
+        return songs
     }
 
     private fun getData(songs: MutableList<Song>): MutableMap<String, MutableList<Song>> {
         val map = mutableMapOf<String, MutableList<Song>>()
         for (s in songs) {
-            val f = PinYinUtil.getPinYinHeader(s.name)
+            val f = s.name?.let { PinYinUtil.getPinYinHeader(it) }
             f?.let {
                 if (map.containsKey(f)) {
                     val list: MutableList<Song>? = map[f]

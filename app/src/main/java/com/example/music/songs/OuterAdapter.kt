@@ -13,12 +13,56 @@ import com.example.music.entity.Song
 class OuterAdapter(var data: MutableMap<String, MutableList<Song>>? = null, var listener: SongsListener? = null,
                    var title: MutableList<String>? = null): RecyclerView.Adapter<OuterAdapter.OuterHolder>() {
 
+    private val innerListener = object : InnerListener {
+        override fun callback(listPosition: Int, songPosition: Int) {
+            if (listPosition < 0 ) return
+            val songs = getSongs()
+            if (songs.isEmpty()) return
+            listener?.transmitData(songs)
+            val position = getClickPosition(listPosition, songPosition)
+            listener?.playFrom(position)
+
+        }
+    }
+
     class OuterHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         val titleText: TextView = itemView.findViewById(R.id.songs_inner_title)
         val recyclerView: RecyclerView = itemView.findViewById(R.id.songs_inner_list)
         init {
             recyclerView.layoutManager = LinearLayoutManager(itemView.context)
         }
+    }
+
+
+    interface InnerListener {
+        fun callback(listPosition: Int, songPosition: Int)
+    }
+
+    private fun getClickPosition(listPosition: Int, songPosition: Int): Int {
+        var position: Int = songPosition
+        for (i in 0 until listPosition) {
+            val t = title?.get(i)
+            t?.let {
+                val s = data?.get(t)
+                s?.let { position += s.size }
+            }
+        }
+        return position
+    }
+
+    private fun getSongs(): MutableList<Song> {
+        val count = title?.size
+        val songs = mutableListOf<Song>()
+        count?.let {
+            for (i in 0 until it) {
+                val t = title?.get(i)
+                t?.let {
+                    val s = data?.get(t)
+                    s?.let { it1 -> songs.addAll(it1) }
+                }
+            }
+        }
+        return songs
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OuterHolder {
@@ -34,7 +78,7 @@ class OuterAdapter(var data: MutableMap<String, MutableList<Song>>? = null, var 
         holder.titleText.text = title?.get(position) ?: "#"
         title?.get(position)?.let {
             data?.get(it)?.let {
-                    it1 -> holder.recyclerView.adapter = InnerAdapter(it1)
+                    it1 -> holder.recyclerView.adapter = InnerAdapter(it1, position, innerListener)
             }
         }
 

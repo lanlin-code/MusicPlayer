@@ -27,8 +27,9 @@ class BannerAdapter(private var urlList: MutableList<String>): PagerAdapter() {
     }
 
     override fun instantiateItem(container: ViewGroup, position: Int): Any {
-        val realPosition = position % urlList.size
         val item = ImageView(container.context)
+        if(urlList.size == 0) return item
+        val realPosition = position % urlList.size
         Picasso.with(container.context).load(urlList[realPosition]).into(item)
         container.addView(item)
         return item

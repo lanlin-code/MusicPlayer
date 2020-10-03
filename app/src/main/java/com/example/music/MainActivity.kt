@@ -1,12 +1,17 @@
 package com.example.music
 
+import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.IBinder
+import android.os.Looper
 import android.util.Log
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
+import android.view.View
+import android.widget.*
 import androidx.fragment.app.Fragment
 import com.example.music.autoLogin.AutoLoginFragment
 import com.example.music.entity.Song
@@ -16,6 +21,7 @@ import com.example.music.home.HomeFragment
 import com.example.music.login.LoginFragment
 import com.example.music.login.LoginModel
 import com.example.music.login.LoginPresenter
+import com.example.music.service.MyService
 import com.example.music.util.LogUtil
 import com.squareup.picasso.Picasso
 
@@ -27,7 +33,36 @@ class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener,
     private val TAG: String = "MainActivity"
     private var loginSuccessListener: OnLoginSuccessListener? = null
     private var userPlaylists: MutableList<UserPlaylist> = mutableListOf()
-    private var songs: MutableList<Song> = mutableListOf()
+    private var player: IMusicPlayer? = null
+    private var connection: ServiceConnection = object : ServiceConnection {
+        override fun onServiceDisconnected(name: ComponentName?) {
+
+        }
+
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            player = IMusicPlayer.Stub.asInterface(service)
+            player?.registerCallback(musicCallback)
+        }
+
+    }
+    private val handler = Handler(Looper.getMainLooper())
+
+    private var musicCallback: IMusicCallback? = object : IMusicCallback.Stub() {
+        override fun getCurrentSong(imgUrl: String?, name: String?) {
+            handler.post {
+                Picasso.with(this@MainActivity).load(imgUrl)
+                    .placeholder(R.drawable.place_holder).error(R.drawable.place_holder).into(imageView)
+                textView.text = name
+            }
+        }
+
+
+    }
+
+    private lateinit var playBar: RelativeLayout
+    private lateinit var imageView: ImageView
+    private lateinit var textView: TextView
+    private lateinit var playStatus: ImageButton
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,14 +76,41 @@ class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener,
         supportFragmentManager.beginTransaction().hide(currentFragment).commit()
         currentFragment = AutoLoginFragment()
         supportFragmentManager.beginTransaction().add(R.id.fragment, currentFragment).commit()
-
-
+        initPlayBar()
+        startService()
     }
+
+    private fun initPlayBar() {
+        playBar = findViewById(R.id.play_bar)
+        imageView = findViewById(R.id.play_bar_img)
+        textView = findViewById(R.id.play_bar_song_name)
+        playStatus = findViewById(R.id.play_state)
+        playStatus.setOnClickListener {
+            player?.let {
+                if (it.isPlaying) {
+                    it.parse()
+                    playStatus.setImageResource(R.drawable.parse)
+                } else {
+                    it.restart()
+                    playStatus.setImageResource(R.drawable.play)
+                }
+            }
+        }
+    }
+
+    private fun startService() {
+        val intent = Intent(this, MyService::class.java)
+        bindService(intent, connection, Context.BIND_AUTO_CREATE)
+    }
+
+
+
+
 
     override fun onDestroy() {
         super.onDestroy()
         loginSuccessListener = null
-
+        musicCallback = null
     }
 
     override fun onBackPressed() {
@@ -173,15 +235,26 @@ class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener,
     }
 
     override fun transmitData(songs: MutableList<Song>) {
-        this.songs.clear()
-        this.songs.addAll(songs)
+        LogUtil.debug(TAG, "size = ${songs.size}")
+        for (s in songs) {
+            LogUtil.debug(TAG, "for $s")
+        }
+        player?.clear()
+        playBar.visibility = View.VISIBLE
+        playStatus.setImageResource(R.drawable.play)
+        player?.receive(songs)
     }
 
     override fun playFrom(position: Int) {
-
+        LogUtil.debug(TAG, "main play from position = $position")
+        player?.playFrom(position)
     }
 
     override fun clearData() {
-        this.songs.clear()
+        player?.clear()
+    }
+
+    override fun seekTo(position: Int) {
+        player?.seekTo(position)
     }
 }

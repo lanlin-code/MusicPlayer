@@ -7,4 +7,5 @@ interface SongsListener {
     fun transmitData(songs: MutableList<Song>)
     fun playFrom(position: Int)
     fun clearData()
+    fun seekTo(position: Int)
 }

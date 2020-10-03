@@ -43,7 +43,11 @@ class MusicImplement : ClientMusicApi {
     }
 
     override fun getSongPlay(id: Long, callBack: RequestCallBack<SongPlayJson>) {
-
+        val o = musicAPI.getSongPlay(id)
+        o.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({ callBack.callback(it) }, {
+            Log.d(tag, it.message, it)
+            it.message?.let { m -> callBack.error(m) }
+        })
     }
 
     override fun getSongsPlay(ids: String, callBack: RequestCallBack<SongPlayJson>) {

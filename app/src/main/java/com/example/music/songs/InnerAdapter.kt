@@ -8,11 +8,15 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.music.R
+import com.example.music.SongsListener
 import com.example.music.entity.Song
+import com.example.music.util.LogUtil
 import com.squareup.picasso.Picasso
 import java.lang.StringBuilder
 
-class InnerAdapter(var data: MutableList<Song>? = null): RecyclerView.Adapter<InnerAdapter.InnerHolder>() {
+class InnerAdapter(var data: MutableList<Song>? = null,
+                   var myPosition: Int = -1,
+                   var innerListener: OuterAdapter.InnerListener? = null): RecyclerView.Adapter<InnerAdapter.InnerHolder>() {
 
     class InnerHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         val imageView = itemView.findViewById<ImageView>(R.id.song_inner_iv)
@@ -31,6 +35,11 @@ class InnerAdapter(var data: MutableList<Song>? = null): RecyclerView.Adapter<In
     }
 
     override fun onBindViewHolder(holder: InnerHolder, position: Int) {
+        holder.itemView.setOnClickListener {
+            data?.let {
+                innerListener?.callback(myPosition, position)
+            }
+        }
         val item = data?.get(position)
         item?.let {
             val iv = holder.imageView

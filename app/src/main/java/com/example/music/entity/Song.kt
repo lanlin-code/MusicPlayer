@@ -1,14 +1,75 @@
 package com.example.music.entity
 
-import com.example.music.util.LogUtil
+import android.os.Bundle
+import android.os.Parcel
+import android.os.Parcelable
 import com.example.respository.bean.SongDetailJson
 
-class Song(var id: Long = errorId, var name: String = errorString,
-           var albumId: Long = errorId, var albumPic: String = errorString,
-           var albumName: String = errorString) {
-    var artists: MutableList<Artist> = mutableListOf()
+class Song(
+    var id: Long = errorId, var name: String? = errorString,
+    var albumId: Long = errorId, var albumPic: String? = errorString,
+    var albumName: String? = errorString) : Parcelable {
 
-    companion object {
+//    var artists: MutableList<Artist> = mutableListOf()
+    var artists: ArrayList<Artist> = arrayListOf()
+    var url: String = errorString
+
+    fun errorUrl(): Boolean = url == errorString
+
+
+    constructor(parcel: Parcel) : this(
+        parcel.readLong(),
+        parcel.readString(),
+        parcel.readLong(),
+        parcel.readString(),
+        parcel.readString()
+    ) {
+
+
+    }
+
+    override fun toString(): String {
+        return "[Song id = $id, name = $name, albumId = $albumName, albumName = $albumName\n" +
+                "albumPic = $albumPic, artist = $artists"
+    }
+
+
+
+
+    class Artist(var id: Long = errorId, var name: String? = errorString) {
+        override fun toString(): String {
+            return "name = $name"
+        }
+
+        companion object {
+            fun isError(artist: Artist): Boolean = artist.id == errorId || artist.name == errorString
+        }
+
+    }
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeLong(id)
+        parcel.writeString(name)
+        parcel.writeLong(albumId)
+        parcel.writeString(albumPic)
+        parcel.writeString(albumName)
+    }
+
+
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    companion object CREATOR : Parcelable.Creator<Song> {
+        override fun createFromParcel(parcel: Parcel): Song {
+            return Song(parcel)
+        }
+
+        override fun newArray(size: Int): Array<Song?> {
+            return arrayOfNulls(size)
+        }
+
         const val errorId: Long = -1L
         const val errorString: String = ""
 
@@ -58,22 +119,7 @@ class Song(var id: Long = errorId, var name: String = errorString,
 
         private fun isError(song: Song): Boolean = song.id == errorId || song.name == errorString
                 || song.albumId == errorId || song.albumPic == errorString
-
     }
 
-    override fun toString(): String {
-        return "[Song id = $id, name = $name, albumId = $albumName, albumName = $albumName\n" +
-                "albumPic = $albumPic, artist = $artists"
-    }
-
-    class Artist(var id: Long = errorId, var name: String = errorString) {
-        companion object {
-            fun isError(artist: Artist): Boolean = artist.id == errorId || artist.name == errorString
-        }
-
-        override fun toString(): String {
-            return "name = $name"
-        }
-    }
 
 }

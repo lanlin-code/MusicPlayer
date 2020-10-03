@@ -71,6 +71,7 @@ class SongsFragment(private var playlist: UserPlaylist? = null): BaseFragment() 
         initPlaylistMessage(view)
         initUserMessage(view)
         val playAll = view.findViewById<LinearLayout>(R.id.songs_play_all)
+        songShow.playAll = playAll
         outerView = view.findViewById(R.id.songs_outer_list)
         indexView = view.findViewById(R.id.songs_index)
         outerView?.let {
