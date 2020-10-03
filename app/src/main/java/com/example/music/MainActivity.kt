@@ -21,6 +21,7 @@ import com.example.music.home.HomeFragment
 import com.example.music.login.LoginFragment
 import com.example.music.login.LoginModel
 import com.example.music.login.LoginPresenter
+import com.example.music.play.SongPlayFragment
 import com.example.music.service.MyService
 import com.example.music.util.LogUtil
 import com.squareup.picasso.Picasso
@@ -85,6 +86,7 @@ class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener,
         imageView = findViewById(R.id.play_bar_img)
         textView = findViewById(R.id.play_bar_song_name)
         playStatus = findViewById(R.id.play_state)
+        playBar.setOnClickListener { onFragmentChange(SongPlayFragment(player)) }
         playStatus.setOnClickListener {
             player?.let {
                 if (it.isPlaying) {
@@ -103,14 +105,11 @@ class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener,
         bindService(intent, connection, Context.BIND_AUTO_CREATE)
     }
 
-
-
-
-
     override fun onDestroy() {
         super.onDestroy()
         loginSuccessListener = null
         musicCallback = null
+        player?.clearAllCallback()
     }
 
     override fun onBackPressed() {
@@ -118,12 +117,28 @@ class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener,
             val h = getHomeFragment()
             h?.let {
                 val t = supportFragmentManager.beginTransaction().hide(currentFragment).show(it)
+                showPlayBar()
                 t.remove(currentFragment)
                 t.commit()
                 currentFragment = it
             }
         } else {
             super.onBackPressed()
+        }
+    }
+
+    private fun showPlayBar() {
+        player?.let {
+            if (it.showBar()) {
+                if (it.isPlaying) {
+                    playStatus.setImageResource(R.drawable.play)
+                } else {
+                    playStatus.setImageResource(R.drawable.parse)
+                }
+                playBar.visibility = View.VISIBLE
+            } else {
+                playBar.visibility = View.GONE
+            }
         }
     }
 
@@ -155,6 +170,9 @@ class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener,
      * 碎片跳转时回调
      */
     override fun onFragmentChange(fragment: Fragment) {
+        if (fragment is SongPlayFragment) {
+            playBar.visibility = View.GONE
+        }
         supportFragmentManager.beginTransaction().hide(currentFragment).add(R.id.fragment, fragment).commit()
         currentFragment = fragment
     }
@@ -165,6 +183,7 @@ class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener,
     override fun onBackHome() {
         getHomeFragment()?.let {
             val t = supportFragmentManager.beginTransaction().hide(currentFragment).show(it)
+            showPlayBar()
             t.remove(currentFragment)
             t.commit()
             currentFragment = it
@@ -252,6 +271,7 @@ class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener,
 
     override fun clearData() {
         player?.clear()
+        playBar.visibility = View.GONE
     }
 
     override fun seekTo(position: Int) {

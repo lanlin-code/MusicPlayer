@@ -14,4 +14,5 @@
     <string name="playlist">歌单</string>
     <string name="user">用户</string>
     <string name="unknown">未知</string>
+    <string name="time_start">00:00</string>
 </resources>

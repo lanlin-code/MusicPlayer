@@ -24,8 +24,11 @@ interface IMusicPlayer {
     void mode(int mode);
     void restart();
     void registerCallback(in IMusicCallback callback);
-    void unregisterCallback();
+    void clearAllCallback();
     boolean isPlaying();
+    Song currentPlaying();
+    boolean showBar();
+    int getMode();
 
 
 

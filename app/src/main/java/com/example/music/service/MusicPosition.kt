@@ -7,6 +7,7 @@ class MusicPosition {
         const val order = 0 // 顺序播放
         const val random = 1 // 随机播放
         const val circle = 2 // 循环播放
+        const val modeSize = 3
         const val tag = "MusicPosition"
     }
 

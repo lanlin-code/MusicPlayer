@@ -8,25 +8,27 @@ import com.example.respository.bean.SongDetailJson
 class Song(
     var id: Long = errorId, var name: String? = errorString,
     var albumId: Long = errorId, var albumPic: String? = errorString,
-    var albumName: String? = errorString) : Parcelable {
+    var albumName: String? = errorString, var artists: ArrayList<Artist> = arrayListOf()): Parcelable{
 
 //    var artists: MutableList<Artist> = mutableListOf()
-    var artists: ArrayList<Artist> = arrayListOf()
+
     var url: String = errorString
-
-    fun errorUrl(): Boolean = url == errorString
-
 
     constructor(parcel: Parcel) : this(
         parcel.readLong(),
         parcel.readString(),
         parcel.readLong(),
         parcel.readString(),
-        parcel.readString()
+        parcel.readString(),
+        parcel.readArrayList(Artist::class.java.classLoader) as ArrayList<Artist>
     ) {
 
-
     }
+
+    fun errorUrl(): Boolean = url == errorString
+
+
+
 
     override fun toString(): String {
         return "[Song id = $id, name = $name, albumId = $albumName, albumName = $albumName\n" +
@@ -36,12 +38,37 @@ class Song(
 
 
 
-    class Artist(var id: Long = errorId, var name: String? = errorString) {
+    class Artist(var id: Long = errorId, var name: String? = errorString): Parcelable {
+        constructor(parcel: Parcel) : this(
+            parcel.readLong(),
+            parcel.readString()
+        ) {
+        }
+
         override fun toString(): String {
             return "name = $name"
         }
 
-        companion object {
+
+
+        override fun writeToParcel(parcel: Parcel, flags: Int) {
+            parcel.writeLong(id)
+            parcel.writeString(name)
+        }
+
+        override fun describeContents(): Int {
+            return 0
+        }
+
+        companion object CREATOR : Parcelable.Creator<Artist> {
+            override fun createFromParcel(parcel: Parcel): Artist {
+                return Artist(parcel)
+            }
+
+            override fun newArray(size: Int): Array<Artist?> {
+                return arrayOfNulls(size)
+            }
+
             fun isError(artist: Artist): Boolean = artist.id == errorId || artist.name == errorString
         }
 
@@ -53,9 +80,8 @@ class Song(
         parcel.writeLong(albumId)
         parcel.writeString(albumPic)
         parcel.writeString(albumName)
+        parcel.writeList(artists as List<*>?)
     }
-
-
 
     override fun describeContents(): Int {
         return 0

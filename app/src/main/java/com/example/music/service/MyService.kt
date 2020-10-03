@@ -33,7 +33,7 @@ class MyService : Service() {
 
 
 
-    private val binder = object : IMusicPlayer.Stub() {
+    private val binder =  object : IMusicPlayer.Stub() {
         override fun clear() {
             musicPlayer.reset()
             songList.clear()
@@ -61,6 +61,18 @@ class MyService : Service() {
 
         override fun isPlaying(): Boolean {
             return musicPlayer.isPlaying
+        }
+
+        override fun currentPlaying(): Song {
+            return songList[musicPosition.currentPosition]
+        }
+
+        override fun showBar(): Boolean {
+            return songList.size > 0
+        }
+
+        override fun getMode(): Int {
+            return musicPosition.mode
         }
 
         override fun next() {
@@ -93,9 +105,6 @@ class MyService : Service() {
         override fun receive(songs: MutableList<Song>?) {
             LogUtil.debug(tag, "here is receive")
             if (songs != null) {
-                for (s in songs) {
-                    LogUtil.debug(tag, "receive $s")
-                }
                 songList.addAll(songs)
                 musicPosition.size = songList.size
                 musicPosition.currentPosition = 0
@@ -107,7 +116,7 @@ class MyService : Service() {
             musicPlayer.start()
         }
 
-        override fun unregisterCallback() {
+        override fun clearAllCallback() {
             val count = callbackList.beginBroadcast()
             for (i in 0 until count) {
                 val c = callbackList.getBroadcastItem(i)
@@ -165,7 +174,6 @@ class MyService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        LogUtil.debug("myservice", Thread.currentThread().name)
         musicPlayer = MediaPlayer()
         musicPlayer.setOnPreparedListener {
             musicPlayer.start()
@@ -216,6 +224,7 @@ class MyService : Service() {
         }
         musicPlayer.release()
         presenter.listener = null
+        songList.clear()
     }
 
     override fun onBind(intent: Intent): IBinder {
