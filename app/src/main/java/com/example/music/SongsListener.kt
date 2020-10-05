@@ -8,4 +8,6 @@ interface SongsListener {
     fun playFrom(position: Int)
     fun clearData()
     fun seekTo(position: Int)
+    fun addToNext(song: Song)
+    fun addAndPlay(song: Song)
 }

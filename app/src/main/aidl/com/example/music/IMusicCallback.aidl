@@ -5,5 +5,7 @@ package com.example.music;
 
 interface IMusicCallback {
     void getCurrentSong(String imgUrl, String name);
+    void playCallback(int position);
+    void obtainLrc(long sid);
 
 }

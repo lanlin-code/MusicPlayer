@@ -4,22 +4,28 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.Path
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import com.example.music.entity.LrcRow
+import com.example.music.util.LogUtil
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
 class LrcView : View {
 
-    var highLightRow: Int = 0 // 当前被选中的歌词位置
-    var model: Int = MODEL_NORMAL // 状态
-    var lrcRow: List<LrcRow>? = null // 全部歌词
+    private var highLightRow: Int = 0 // 当前被选中的歌词位置
+    private var dragRow: Int = highLightRow
+    private var model: Int = MODEL_NORMAL // 状态
+    private var lrcRow: MutableList<LrcRow>? = null // 全部歌词
     lateinit var dragListener: DragListener // 监听拖动
-    lateinit var paint: Paint
-    var lastY: Float = 0.0f // 上一次手指落在屏幕的纵坐标
+    private lateinit var paint: Paint
+    private var lastY: Float = 0.0f // 上一次手指落在屏幕的纵坐标
+    private var textHeight = 0.0f
+    private val path = Path()
+//    var drawLine = false
 
 
     constructor(context: Context) : super(context, null) {
@@ -30,8 +36,18 @@ class LrcView : View {
         initPaint()
     }
 
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
+    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    ) {
         initPaint()
+    }
+
+    fun updateRow() {
+        highLightRow = dragRow
+        model = MODEL_NORMAL
+        invalidate()
     }
 
     companion object {
@@ -42,8 +58,14 @@ class LrcView : View {
     }
 
     interface DragListener {
-        fun onMove()
+        fun onMove(time: String)
         fun onRelease()
+    }
+
+    fun setMode(model: Int) {
+        this.model = model
+        dragRow = highLightRow
+        invalidate()
     }
 
     private fun initPaint() {
@@ -51,9 +73,12 @@ class LrcView : View {
         paint.isAntiAlias = true
         paint.textSize = LRC_SIZE
         paint.textAlign = Paint.Align.CENTER
+        textHeight = abs(paint.ascent() + paint.descent())
     }
 
-    fun setLrc(lrcRow: List<LrcRow>? ) {
+    fun setLrc(lrcRow: MutableList<LrcRow>?) {
+        highLightRow = 0
+        dragRow = 0
         this.lrcRow = lrcRow
         invalidate()
     }
@@ -64,48 +89,94 @@ class LrcView : View {
         if (canvas == null) return
         super.onDraw(canvas)
         val normalColor = Color.GRAY
-        val currentLrc: String? = lrcRow?.get(highLightRow)?.content
+
+        val count = lrcRow?.size
         // 没有歌词时显示
-        if (lrcRow == null || currentLrc == null) {
-            paint.color = normalColor
-            val s = "暂无歌词"
-            canvas.drawText(s, width/2.0f, height/2.0f - LRC_SIZE, paint)
+        if (lrcRow == null || count == null || count <= 0) {
+            drawNoLrc(canvas)
             return
         }
+        val currentLrc: String? = lrcRow?.get(dragRow)?.content
+        if (currentLrc == null) {
+            drawNoLrc(canvas)
+            return
+        }
+        drawLine(canvas)
         // 在布局中心用高亮颜色画出当前被选中的歌词
-        val highLightColor = Color.WHITE
+//        val highLightColor = Color.WHITE
         val centerX = width/2.0f
-        val centerY = height/2.0f - LRC_SIZE/2.0f
-        paint.color = highLightColor
-        canvas.drawText(currentLrc, centerX, centerY, paint)
+        val centerY = height/2.0f + textHeight / 2.0f
+//        paint.color = Color.GRAY
+        if (highLightRow == dragRow) {
+            paint.color = Color.WHITE
+        } else {
+            paint.color = Color.DKGRAY
+        }
 
-        val paddingY = 40 // 每行歌词的间距
-        var lastY = centerY - LRC_SIZE/2.0f - paddingY
+        canvas.drawText(currentLrc, centerX, centerY, paint)
+        val paddingY = textHeight*3 // 每行歌词的间距
+        var lastY = centerY - textHeight/2.0f - paddingY
         paint.color = normalColor
         // 画出选中歌词上面的歌词
-        for (i in highLightRow - 1 downTo 0) {
+        for (i in dragRow - 1 downTo 0) {
+            if (i == highLightRow) {
+                paint.color = Color.WHITE
+            } else {
+                paint.color = Color.GRAY
+            }
             val s = lrcRow?.get(i)?.content
             if (s != null) {
                 canvas.drawText(s, centerX, lastY, paint)
-                lastY -= (LRC_SIZE/2.0f + paddingY)
+                lastY -= (textHeight/2.0f + paddingY)
             }
         }
 
         // 画出选中歌词下面的歌词
         val size = lrcRow?.size
-        var nextY = centerY + LRC_SIZE/2.0f + paddingY
+        var nextY = centerY + textHeight/2.0f + paddingY
         if (size != null) {
-            for (i in highLightRow + 1 until size) {
+            for (i in dragRow + 1 until size) {
+                if (i == highLightRow) {
+                    paint.color = Color.WHITE
+                } else {
+                    paint.color = Color.GRAY
+                }
                 val s = lrcRow?.get(i)?.content
                 if (s != null) {
                     canvas.drawText(s, centerX, nextY, paint)
-                    nextY += (LRC_SIZE/2.0f + paddingY)
+                    nextY += (textHeight/2.0f + paddingY)
                 }
             }
         }
 
 
     }
+
+    private fun drawNoLrc(canvas: Canvas) {
+        paint.color = Color.GRAY
+        val s = "暂无歌词"
+        canvas.drawText(s, width / 2.0f, height / 2.0f + textHeight / 2.0f, paint)
+    }
+
+    private fun drawLine(canvas: Canvas) {
+//        if (!drawLine) return
+        if(model == MODEL_NORMAL) return
+        path.moveTo(0.0f, height / 2.0f)
+        path.lineTo(width.toFloat(), height / 2.0f)
+        paint.style = Paint.Style.STROKE
+        paint.color = Color.BLACK
+        canvas.drawPath(path, paint)
+        paint.style = Paint.Style.FILL
+
+    }
+
+
+    fun getCurrentTime(): Long {
+        val l = lrcRow?.get(dragRow)
+        return l?.time ?: 0L
+    }
+
+
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         val size = lrcRow?.size
@@ -116,17 +187,25 @@ class LrcView : View {
             MotionEvent.ACTION_DOWN -> lastY = event.y
             MotionEvent.ACTION_MOVE -> {
                 model = MODEL_DRAG
+//                drawLine = true
                 onLrcMove(event)
-                dragListener.onMove()
+                dragListener.onMove(getTime())
             }
             MotionEvent.ACTION_UP -> {
                 if (model == MODEL_DRAG) {
+                    model = MODEL_RELEASE
                     dragListener.onRelease()
                 }
-                model = MODEL_RELEASE
+
+
             }
         }
         return true
+    }
+
+    private fun getTime(): String {
+        val l = lrcRow?.get(dragRow)
+        return l?.timeText ?: "00:00"
     }
 
     /**
@@ -144,19 +223,19 @@ class LrcView : View {
         if (abs(offsetY) < minOffset) {
             return
         }
-        val offsetRow = (offsetY / LRC_SIZE).toInt()
+        val offsetRow = (offsetY / textHeight).toInt()
         if (offsetRow > 0) {
             lastY = currentY
-            highLightRow += offsetRow
-            highLightRow = max(0, highLightRow)
-            highLightRow = min(highLightRow, size)
+            dragRow += offsetRow
+            dragRow = max(0, dragRow)
+            dragRow = min(dragRow, size)
             invalidate()
         }
     }
 
     fun moveToTime(time: Long) {
         val size = lrcRow?.size
-        if (lrcRow == null || size == 0 || size == null) {
+        if (lrcRow == null || size == 0 || size == null || model != MODEL_NORMAL) {
             return
         }
         for (i in 0 until size) {
@@ -169,7 +248,8 @@ class LrcView : View {
             val currentTime = current?.time
             if (currentTime != null) {
                if (time >= currentTime && (next == null || time < next.time)) {
-                    highLightRow = i
+                   highLightRow = i
+                   dragRow = highLightRow
                    invalidate()
                    break
                }

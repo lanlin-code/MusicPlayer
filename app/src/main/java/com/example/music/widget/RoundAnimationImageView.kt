@@ -31,7 +31,7 @@ class RoundAnimationImageView : androidx.appcompat.widget.AppCompatImageView {
         }
     }
 
-    private fun startAnimation() {
+   fun startAnimation() {
         clearAnimation()
         val duration = 30000L
         val rotateAnimation = RotateAnimation(0f, 360f, Animation.RELATIVE_TO_SELF,
@@ -90,6 +90,7 @@ class RoundAnimationImageView : androidx.appcompat.widget.AppCompatImageView {
     }
 
     private fun drawRoundImage(canvas: Canvas, bitmap: Bitmap) {
+        if (width <= 0 || height <= 0) return
         val b = ThumbnailUtils.extractThumbnail(bitmap, width, height)
         val bitmapShader = BitmapShader(b, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
         paint.shader = bitmapShader

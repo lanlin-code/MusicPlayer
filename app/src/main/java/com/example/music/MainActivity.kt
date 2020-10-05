@@ -22,6 +22,8 @@ import com.example.music.login.LoginFragment
 import com.example.music.login.LoginModel
 import com.example.music.login.LoginPresenter
 import com.example.music.play.SongPlayFragment
+import com.example.music.search.SearchFragment
+import com.example.music.search.result.SearchResultFragment
 import com.example.music.service.MyService
 import com.example.music.util.LogUtil
 import com.squareup.picasso.Picasso
@@ -54,7 +56,17 @@ class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener,
                 Picasso.with(this@MainActivity).load(imgUrl)
                     .placeholder(R.drawable.place_holder).error(R.drawable.place_holder).into(imageView)
                 textView.text = name
+                playStatus.setImageResource(R.drawable.play)
+
             }
+        }
+
+        override fun playCallback(position: Int) {
+
+        }
+
+        override fun obtainLrc(sid: Long) {
+
         }
 
 
@@ -174,6 +186,9 @@ class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener,
             playBar.visibility = View.GONE
         }
         supportFragmentManager.beginTransaction().hide(currentFragment).add(R.id.fragment, fragment).commit()
+        if (currentFragment is SearchResultFragment) {
+            supportFragmentManager.beginTransaction().remove(currentFragment).commit()
+        }
         currentFragment = fragment
     }
 
@@ -181,6 +196,10 @@ class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener,
      * 移除当前碎片，返回主页
      */
     override fun onBackHome() {
+        if (currentFragment is SearchResultFragment) {
+            onFragmentChange(SearchFragment())
+            return
+        }
         getHomeFragment()?.let {
             val t = supportFragmentManager.beginTransaction().hide(currentFragment).show(it)
             showPlayBar()
@@ -254,10 +273,6 @@ class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener,
     }
 
     override fun transmitData(songs: MutableList<Song>) {
-        LogUtil.debug(TAG, "size = ${songs.size}")
-        for (s in songs) {
-            LogUtil.debug(TAG, "for $s")
-        }
         player?.clear()
         playBar.visibility = View.VISIBLE
         playStatus.setImageResource(R.drawable.play)
@@ -265,7 +280,6 @@ class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener,
     }
 
     override fun playFrom(position: Int) {
-        LogUtil.debug(TAG, "main play from position = $position")
         player?.playFrom(position)
     }
 
@@ -276,5 +290,13 @@ class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener,
 
     override fun seekTo(position: Int) {
         player?.seekTo(position)
+    }
+
+    override fun addToNext(song: Song) {
+        player?.addSong(song)
+    }
+
+    override fun addAndPlay(song: Song) {
+        player?.addAndPlay(song)
     }
 }

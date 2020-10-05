@@ -24,7 +24,8 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:layout_marginStart="20dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -65,19 +66,54 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical">
 
-                <RelativeLayout
+                <com.example.music.widget.MyRelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="1">
+                    android:layout_weight="1"
+                    android:id="@+id/play_center_layout">
 
                     <com.example.music.widget.RoundAnimationImageView
                         android:layout_width="250dp"
                         android:layout_height="250dp"
                         android:id="@+id/play_image"
-                        android:layout_centerInParent="true"/>
+                        android:layout_centerInParent="true" />
+
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/play_lrc_play"
+                        android:src="@drawable/play_16"
+                        android:background="@android:color/transparent"
+                        android:layout_marginEnd="20dp"
+                        android:visibility="gone"
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentStart="true"/>
 
 
-                </RelativeLayout>
+                    <com.example.music.widget.LrcView
+                        android:layout_width="300dp"
+                        android:duplicateParentState="true"
+                        android:layout_centerInParent="true"
+                        android:visibility="gone"
+                        android:layout_height="match_parent"
+                        android:id="@+id/play_lrc"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/play_lrc_time"
+                        android:visibility="gone"
+                        android:layout_marginStart="20dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:text="@string/time_start"/>
+
+
+
+
+
+
+                </com.example.music.widget.MyRelativeLayout>
 
 
                 <LinearLayout

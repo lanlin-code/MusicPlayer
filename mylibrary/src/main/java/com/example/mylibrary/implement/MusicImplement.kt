@@ -55,7 +55,11 @@ class MusicImplement : ClientMusicApi {
     }
 
     override fun getSongLyric(id: Long, callBack: RequestCallBack<LyricJson>) {
-
+        val o = musicAPI.getSongLyric(id)
+        o.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({ callBack.callback(it) }, {
+            Log.d(tag, it.message, it)
+            it.message?.let { m -> callBack.error(m) }
+        })
     }
 
 

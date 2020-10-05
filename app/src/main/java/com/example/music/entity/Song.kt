@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.os.Parcel
 import android.os.Parcelable
 import com.example.respository.bean.SongDetailJson
+import java.lang.StringBuilder
 
 class Song(
     var id: Long = errorId, var name: String? = errorString,
@@ -24,6 +25,8 @@ class Song(
     ) {
 
     }
+
+
 
     fun errorUrl(): Boolean = url == errorString
 
@@ -87,6 +90,18 @@ class Song(
         return 0
     }
 
+    fun appendArtists(): String {
+        val builder = StringBuilder()
+        val size = artists.size
+        for (i in 0 until size) {
+            builder.append(artists[i].name)
+            if (i != size - 1) {
+                builder.append(" ")
+            }
+        }
+        return builder.toString()
+    }
+
     companion object CREATOR : Parcelable.Creator<Song> {
         override fun createFromParcel(parcel: Parcel): Song {
             return Song(parcel)
@@ -112,6 +127,7 @@ class Song(
             }
             return r
         }
+
 
         private fun valueOf(s: SongDetailJson.Song): Song {
             val song = Song()

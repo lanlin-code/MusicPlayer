@@ -20,7 +20,7 @@
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/search_button"
+            android:id="@+id/home_search_button"
             android:layout_alignParentEnd="true"
             android:src="@drawable/search"
             android:background="@drawable/circle_button"/>

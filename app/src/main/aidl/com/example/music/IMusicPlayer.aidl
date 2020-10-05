@@ -24,11 +24,16 @@ interface IMusicPlayer {
     void mode(int mode);
     void restart();
     void registerCallback(in IMusicCallback callback);
+    void unregisterCallback(in IMusicCallback callback);
     void clearAllCallback();
     boolean isPlaying();
     Song currentPlaying();
     boolean showBar();
     int getMode();
+    boolean updateLayout(int position);
+    void addSong(in Song song);
+    void removeSong(in Song song);
+    void addAndPlay(in Song song);
 
 
 

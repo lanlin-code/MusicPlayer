@@ -9,17 +9,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.RelativeLayout
 import android.widget.SeekBar
 import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
-import com.example.music.BaseFragment
-import com.example.music.IMusicPlayer
-import com.example.music.R
-import com.example.music.SongsListener
+import com.example.music.*
 import com.example.music.entity.Song
 import com.example.music.service.MusicPosition
 import com.example.music.util.LogUtil
+import com.example.music.widget.LrcView
 import com.example.music.widget.MyLayout
 import com.example.music.widget.RoundAnimationImageView
 import jp.wasabeef.glide.transformations.BlurTransformation
@@ -40,11 +39,43 @@ class SongPlayFragment(var player: IMusicPlayer? = null): BaseFragment() {
     private lateinit var duration: TextView
     private lateinit var playState: ImageButton
     private lateinit var playMode: ImageButton
+    private lateinit var lrcView: LrcView
+    private val presenter = SongPlayPresenter()
+    private val model = SongPlayModel()
+    private val playCallback = SongPlayCallback()
+    private val dragListener = LrcDrag()
     private var drag = false
+    private val timerPeriod = 100L
+    private val updateDelay = 1000L
     private var timer = Timer()
+    private val timerHandler = Handler(Looper.getMainLooper())
     private val handler = Handler(Looper.getMainLooper())
+    private var callback: IMusicCallback? = object : IMusicCallback.Stub() {
+        override fun getCurrentSong(imgUrl: String?, name: String?) {
+
+        }
+
+        override fun playCallback(position: Int) {
+            handler.postDelayed({
+                player?.let {
+                    if (it.updateLayout(position)) {
+                        updateLayout()
+                    }
+                }
+            }, updateDelay)
+        }
+
+        override fun obtainLrc(sid: Long) {
+            LogUtil.debug(TAG, "sid = $sid")
+            handler.post { model.lyric(sid, presenter) }
+
+        }
+
+
+    }
     private val format = SimpleDateFormat.getDateInstance() as SimpleDateFormat
     private var currentMode = MusicPosition.order
+
 
     init {
         format.applyPattern("mm:ss")
@@ -71,7 +102,13 @@ class SongPlayFragment(var player: IMusicPlayer? = null): BaseFragment() {
         val back = view.findViewById<ImageButton>(R.id.play_back)
         back.setOnClickListener { fragmentChangeListener?.onBackHome() }
         initLayout(view)
+        presenter.responseCallback = playCallback
+        playCallback.listener = songsListener
+        playCallback.sListener = SongPlayShow(lrcView)
         updateLayout()
+        getLrc()
+
+
 
     }
 
@@ -84,6 +121,33 @@ class SongPlayFragment(var player: IMusicPlayer? = null): BaseFragment() {
         currentTime = view.findViewById(R.id.play_current_time)
         seekBar = view.findViewById(R.id.play_seek_bar)
         duration = view.findViewById(R.id.play_duration)
+        lrcView = view.findViewById(R.id.play_lrc)
+        val centerLayout = view.findViewById<RelativeLayout>(R.id.play_center_layout)
+        val touchPlay = view.findViewById<ImageButton>(R.id.play_lrc_play)
+        val timeText = view.findViewById<TextView>(R.id.play_lrc_time)
+        centerLayout.setOnClickListener {
+            if (songImg.visibility == View.VISIBLE) {
+                LogUtil.debug(TAG, "click")
+                songImg.clearAnimation()
+                songImg.visibility = View.GONE
+                lrcView.visibility = View.VISIBLE
+            } else {
+                songImg.startAnimation()
+                songImg.visibility = View.VISIBLE
+                lrcView.visibility = View.GONE
+            }
+        }
+        touchPlay.setOnClickListener {
+            val t = lrcView.getCurrentTime()
+            touchPlay.visibility = View.GONE
+            timeText.visibility = View.GONE
+            lrcView.updateRow()
+            player?.seekTo(t.toInt())
+        }
+        dragListener.textView = timeText
+        dragListener.touchPlay = touchPlay
+        lrcView.dragListener = dragListener
+        dragListener.lrcView = lrcView
         initSeekBar()
         playState = view.findViewById(R.id.play_play_state)
         initButtonState()
@@ -94,7 +158,7 @@ class SongPlayFragment(var player: IMusicPlayer? = null): BaseFragment() {
         initButtonMode()
         val next = view.findViewById<ImageButton>(R.id.play_next)
         next.setOnClickListener { player?.next() }
-
+        player?.registerCallback(callback)
     }
 
     private fun initButtonMode() {
@@ -157,6 +221,7 @@ class SongPlayFragment(var player: IMusicPlayer? = null): BaseFragment() {
                 drag = false
                 seekBar?.let {
                     songsListener?.seekTo(it.progress)
+                    lrcView.moveToTime(it.progress.toLong())
                 }
             }
         })
@@ -164,18 +229,25 @@ class SongPlayFragment(var player: IMusicPlayer? = null): BaseFragment() {
         timer.schedule(object : TimerTask() {
             override fun run() {
                 if (!drag) {
-                    handler.post {
+                    timerHandler.post {
                         player?.let {
                             val c = it.currentPosition()
                             val s = format.format(c)
                             seekBar.progress = c
-                            LogUtil.debug(TAG, "currentTime = $s")
                             currentTime.text = s
+                            lrcView.moveToTime(c.toLong())
                         }
                     }
                 }
             }
-        }, 0L, 100L)
+        }, 0L, timerPeriod)
+    }
+
+    private fun getLrc() {
+        val s = player?.currentPlaying()
+        s?.let {
+            handler.post { model.lyric(it.id, presenter) }
+        }
     }
 
     private fun updateLayout() {
@@ -187,20 +259,14 @@ class SongPlayFragment(var player: IMusicPlayer? = null): BaseFragment() {
                 )).into(layout.target)
                 Glide.with(this).load(it.albumPic).into(songImg)
                 name.text = it.name
-                val builder = StringBuilder()
-                val size = it.artists.size
-                for (i in 0 until size) {
-                    builder.append(it.artists[i].name)
-                    if (i != size - 1) {
-                        builder.append(" ")
-                    }
-                }
-                artist.text = builder.toString()
+                artist.text = it.appendArtists()
+
+//                model.lyric(it.id, presenter)
             }
             player?.let {
                 val d = it.duration()
                 val ds = format.format(d)
-                LogUtil.debug(TAG, "duration = $ds")
+                updateButtonState(it.isPlaying)
                 seekBar.max = d
                 currentTime.text = format.format(it.currentPosition())
                 duration.text = ds
@@ -213,9 +279,15 @@ class SongPlayFragment(var player: IMusicPlayer? = null): BaseFragment() {
 
     override fun onDetach() {
         super.onDetach()
+        presenter.responseCallback = null
+        playCallback.sListener = null
+        playCallback.listener = null
         songsListener = null
+        player?.unregisterCallback(callback)
+        callback = null
         player = null
         songImg.clearAnimation()
+        dragListener.clear()
         timer.cancel()
     }
 }

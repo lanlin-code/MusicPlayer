@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
@@ -21,6 +22,7 @@ import com.example.music.playlist.PlaylistCallback
 import com.example.music.playlist.PlaylistModel
 import com.example.music.playlist.PlaylistPresenter
 import com.example.music.playlist.PlaylistShow
+import com.example.music.search.SearchFragment
 import com.example.music.showUserStatus.ShowUserStatusFragment
 import com.example.music.util.LogUtil
 import com.example.music.util.ThreadAdjust
@@ -76,6 +78,8 @@ class HomeFragment: Fragment(), MainActivity.OnLoginSuccessListener, ResponseCal
                 listener?.onFragmentChange(ShowUserStatusFragment())
             }
         }
+        val searchButton = view.findViewById<ImageButton>(R.id.home_search_button)
+        searchButton.setOnClickListener { listener?.onFragmentChange(SearchFragment()) }
         bannerView = view.findViewById(R.id.banner)
         bannerDots = view.findViewById(R.id.banner_dots)
         recyclerView = view.findViewById(R.id.all_playlists)
