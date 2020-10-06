@@ -53,8 +53,13 @@ class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener,
     private var musicCallback: IMusicCallback? = object : IMusicCallback.Stub() {
         override fun getCurrentSong(imgUrl: String?, name: String?) {
             handler.post {
-                Picasso.with(this@MainActivity).load(imgUrl)
-                    .placeholder(R.drawable.place_holder).error(R.drawable.place_holder).into(imageView)
+                playBar.visibility = View.VISIBLE
+                imgUrl?.let {
+                    if (it.isNotEmpty()) {
+                        Picasso.with(this@MainActivity).load(imgUrl)
+                            .placeholder(R.drawable.place_holder).error(R.drawable.place_holder).into(imageView)
+                    }
+                }
                 textView.text = name
                 playStatus.setImageResource(R.drawable.play)
 
@@ -103,7 +108,7 @@ class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener,
             player?.let {
                 if (it.isPlaying) {
                     it.parse()
-                    playStatus.setImageResource(R.drawable.parse)
+                    playStatus.setImageResource(R.drawable.parse_48)
                 } else {
                     it.restart()
                     playStatus.setImageResource(R.drawable.play)
@@ -145,7 +150,7 @@ class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener,
                 if (it.isPlaying) {
                     playStatus.setImageResource(R.drawable.play)
                 } else {
-                    playStatus.setImageResource(R.drawable.parse)
+                    playStatus.setImageResource(R.drawable.parse_48)
                 }
                 playBar.visibility = View.VISIBLE
             } else {

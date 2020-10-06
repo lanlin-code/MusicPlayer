@@ -19,6 +19,10 @@ class SearchImplement : ClientSearchApi {
         callBack: RequestCallBack<SearchSongJson>
     ) {
 
+        val o = searchApi.getSearchSongs(keyword, limit, offset)
+        o.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ callBack.callback(it) }, { it.message?.let { m -> callBack.error(m) } })
+
     }
 
     override fun getDefaultKeywords(callBack: RequestCallBack<SearchDefaultJson>) {

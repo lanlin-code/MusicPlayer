@@ -9,10 +9,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.music.R
 import com.example.music.SongsListener
 import com.example.music.entity.Song
+import com.example.music.util.LogUtil
 
 
 class ResultAdapter(var listener: SongsListener? = null,
-                    val data: MutableList<Song> = mutableListOf()) : RecyclerView.Adapter<ResultAdapter.ResultHolder>() {
+                    var data: MutableList<Song> = mutableListOf()) : RecyclerView.Adapter<ResultAdapter.ResultHolder>() {
 
     class ResultHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         val name = itemView.findViewById<TextView>(R.id.result_name)
@@ -22,7 +23,7 @@ class ResultAdapter(var listener: SongsListener? = null,
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ResultHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.linearlayout_songs_inner_item, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.linearlayout_result_item, parent, false)
         return ResultHolder(view)
     }
 

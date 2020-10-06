@@ -48,7 +48,7 @@
             android:id="@+id/play_state"
             android:layout_toStartOf="@id/song_list"
             android:background="@android:color/white"
-            android:src="@drawable/parse"/>
+            android:src="@drawable/parse_48"/>
 
 
 

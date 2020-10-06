@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="100dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardCornerRadius="10dp"
+    android:elevation="5dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="5dp"
+            android:layout_weight="1"
+            android:id="@+id/notification_image"
+            android:layout_height="80dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/place_holder"/>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="3"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+               <RelativeLayout
+                   android:layout_width="match_parent"
+                   android:layout_height="0dp"
+                   android:layout_marginStart="10dp"
+                   android:layout_weight="1">
+
+
+
+
+                   <TextView
+                       android:layout_width="match_parent"
+                       android:layout_height="wrap_content"
+                       android:text="@string/unknown"
+                       android:layout_alignParentBottom="true"
+                       android:id="@+id/notification_artist"
+                       android:maxLines="1"
+                       android:layout_marginBottom="3dp"
+                       />
+
+                   <TextView
+                       android:layout_width="match_parent"
+                       android:layout_height="wrap_content"
+                       android:layout_above="@id/notification_artist"
+                       android:textColor="@android:color/black"
+                       android:maxLines="1"
+                       android:textSize="16sp"
+                       android:id="@+id/notification_name"
+                       android:text="@string/unknown"
+                       android:layout_marginBottom="2dp"/>
+
+               </RelativeLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:background="@android:color/darker_gray"
+                    android:layout_height="1dp"/>
+
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1">
+
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/notification_play_status"
+                        android:src="@drawable/parse_32"
+                        android:background="@android:color/transparent"
+                        android:layout_centerInParent="true"/>
+
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/notification_last"
+                        android:src="@drawable/last_song_32"
+                        android:background="@android:color/transparent"
+                        android:layout_toStartOf="@id/notification_play_status"
+                        android:layout_centerVertical="true"
+                        android:layout_marginEnd="10dp"/>
+
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/notification_next"
+                        android:src="@drawable/next_song_32"
+                        android:background="@android:color/transparent"
+                        android:layout_toEndOf="@id/notification_play_status"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="10dp"/>
+
+
+                </RelativeLayout>
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

@@ -3,6 +3,7 @@ package com.example.music.entity
 import android.os.Bundle
 import android.os.Parcel
 import android.os.Parcelable
+import com.example.respository.bean.SearchSongJson
 import com.example.respository.bean.SongDetailJson
 import java.lang.StringBuilder
 
@@ -126,6 +127,37 @@ class Song(
                 }
             }
             return r
+        }
+
+        fun valueOfResult(json: SearchSongJson): MutableList<Song> {
+            val r = mutableListOf<Song>()
+            val d = json.result?.songs
+            d?.let {
+                for (s in it) {
+                    val song = valueOf(s)
+                    if (song.id != errorId && song.name != errorString) {
+                        r.add(song)
+                    }
+                }
+            }
+            return r
+        }
+
+        private fun valueOf(s: SearchSongJson.Result.Song): Song {
+            val song = Song()
+            s.artists?.let {
+                for (a in it) {
+                    val at = Artist()
+                    a.id?.let { i -> at.id = i }
+                    a.name?.let { n -> at.name = n }
+                    if (!Artist.isError(at)) {
+                        song.artists.add(at)
+                    }
+                }
+            }
+            s.id?.let { song.id = it }
+            s.name?.let { song.name = it }
+            return song
         }
 
 

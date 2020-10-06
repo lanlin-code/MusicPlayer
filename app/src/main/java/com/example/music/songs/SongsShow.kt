@@ -18,6 +18,9 @@ class SongsShow(var outerRecyclerview: OuterRecyclerview? = null,
         t.sort()
         outerRecyclerview?.let {
             it.title = t
+            if (it.adapter is OuterAdapter) {
+                (it.adapter as OuterAdapter).listener = null
+            }
             it.adapter = OuterAdapter(map, listener, t)
             it.adapter?.notifyDataSetChanged()
         }

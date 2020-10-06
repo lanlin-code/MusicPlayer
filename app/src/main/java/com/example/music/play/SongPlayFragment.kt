@@ -201,7 +201,7 @@ class SongPlayFragment(var player: IMusicPlayer? = null): BaseFragment() {
         if (playing) {
             playState.setImageResource(R.drawable.play)
         } else {
-            playState.setImageResource(R.drawable.parse)
+            playState.setImageResource(R.drawable.parse_48)
         }
     }
 
