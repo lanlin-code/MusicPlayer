@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.music.R
 import com.example.music.SongsListener
 import com.example.music.entity.Song
+import com.example.music.util.LogUtil
 
 class OuterAdapter(var data: MutableMap<String, MutableList<Song>>? = null, var listener: SongsListener? = null,
                    var title: MutableList<String>? = null): RecyclerView.Adapter<OuterAdapter.OuterHolder>() {
@@ -20,9 +21,15 @@ class OuterAdapter(var data: MutableMap<String, MutableList<Song>>? = null, var 
             if (songs.isEmpty()) return
             listener?.transmitData(songs)
             val position = getClickPosition(listPosition, songPosition)
+            LogUtil.debug("OuterAdapter", "position = $position")
             listener?.playFrom(position)
 
         }
+
+        override fun getSongsListener(): SongsListener? {
+            return listener
+        }
+
     }
 
     class OuterHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
@@ -36,6 +43,7 @@ class OuterAdapter(var data: MutableMap<String, MutableList<Song>>? = null, var 
 
     interface InnerListener {
         fun callback(listPosition: Int, songPosition: Int)
+        fun getSongsListener(): SongsListener?
     }
 
     private fun getClickPosition(listPosition: Int, songPosition: Int): Int {

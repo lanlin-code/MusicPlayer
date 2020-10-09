@@ -204,7 +204,13 @@ class LrcView : View {
     }
 
     private fun getTime(): String {
-        val l = lrcRow?.get(dragRow)
+        val c = lrcRow?.size
+        var l: LrcRow? = null
+        c?.let {
+            if (dragRow < c) {
+                l = lrcRow?.get(dragRow)
+            }
+        }
         return l?.timeText ?: "00:00"
     }
 
@@ -228,7 +234,7 @@ class LrcView : View {
             lastY = currentY
             dragRow += offsetRow
             dragRow = max(0, dragRow)
-            dragRow = min(dragRow, size)
+            dragRow = min(dragRow, size - 1)
             invalidate()
         }
     }

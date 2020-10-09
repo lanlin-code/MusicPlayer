@@ -8,13 +8,11 @@ import android.os.RemoteException
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
-import android.widget.RelativeLayout
-import android.widget.SeekBar
-import android.widget.TextView
+import android.widget.*
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.example.music.*
+import com.example.music.entity.PopOnClickListener
 import com.example.music.entity.Song
 import com.example.music.service.MusicPosition
 import com.example.music.util.LogUtil
@@ -45,6 +43,7 @@ class SongPlayFragment(var player: IMusicPlayer? = null): BaseFragment() {
     private val playCallback = SongPlayCallback()
     private val dragListener = LrcDrag()
     private var drag = false
+    private lateinit var clickListener: PopOnClickListener
     private val timerPeriod = 100L
     private val updateDelay = 1000L
     private var timer = Timer()
@@ -60,6 +59,7 @@ class SongPlayFragment(var player: IMusicPlayer? = null): BaseFragment() {
                 player?.let {
                     if (it.updateLayout(position)) {
                         updateLayout()
+                        clickListener.onChange(position)
                     }
                 }
             }, updateDelay)
@@ -69,6 +69,10 @@ class SongPlayFragment(var player: IMusicPlayer? = null): BaseFragment() {
             LogUtil.debug(TAG, "sid = $sid")
             handler.post { model.lyric(sid, presenter) }
 
+        }
+
+        override fun closeBar() {
+            fragmentChangeListener?.onBackHome()
         }
 
 
@@ -122,6 +126,7 @@ class SongPlayFragment(var player: IMusicPlayer? = null): BaseFragment() {
         seekBar = view.findViewById(R.id.play_seek_bar)
         duration = view.findViewById(R.id.play_duration)
         lrcView = view.findViewById(R.id.play_lrc)
+        clickListener  = PopOnClickListener(songsListener)
         val centerLayout = view.findViewById<RelativeLayout>(R.id.play_center_layout)
         val touchPlay = view.findViewById<ImageButton>(R.id.play_lrc_play)
         val timeText = view.findViewById<TextView>(R.id.play_lrc_time)
@@ -150,6 +155,7 @@ class SongPlayFragment(var player: IMusicPlayer? = null): BaseFragment() {
         dragListener.lrcView = lrcView
         initSeekBar()
         playState = view.findViewById(R.id.play_play_state)
+        clickListener.playState = playState
         initButtonState()
         player?.let { updateButtonState(it.isPlaying) }
         val last = view.findViewById<ImageButton>(R.id.play_last)
@@ -158,7 +164,11 @@ class SongPlayFragment(var player: IMusicPlayer? = null): BaseFragment() {
         initButtonMode()
         val next = view.findViewById<ImageButton>(R.id.play_next)
         next.setOnClickListener { player?.next() }
+        val popList = view.findViewById<ImageButton>(R.id.play_list)
+        popList.setOnClickListener(clickListener)
         player?.registerCallback(callback)
+
+
     }
 
     private fun initButtonMode() {
@@ -279,6 +289,9 @@ class SongPlayFragment(var player: IMusicPlayer? = null): BaseFragment() {
 
     override fun onDetach() {
         super.onDetach()
+        clickListener.playState = null
+        clickListener.destroy()
+//        clickListener = null
         presenter.responseCallback = null
         playCallback.sListener = null
         playCallback.listener = null

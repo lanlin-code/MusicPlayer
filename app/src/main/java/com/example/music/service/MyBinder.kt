@@ -38,6 +38,7 @@ class MyBinder(context: Context) : IMusicPlayer.Stub() {
         }
         presenter.listener = object : ResponseCallback<MutableList<SongData>> {
             override fun onSuccess(data: MutableList<SongData>) {
+                LogUtil.debug(tag, data.toString())
                 if (data.size <= 0) {
                     Toast.makeText(context.applicationContext, "加载失败", Toast.LENGTH_SHORT).show()
                     next()
@@ -72,6 +73,7 @@ class MyBinder(context: Context) : IMusicPlayer.Stub() {
         songList.clear()
         musicPosition.size = 0
         musicPosition.currentPosition = 0
+        notifySongsNull()
     }
 
     override fun parse() {
@@ -128,6 +130,10 @@ class MyBinder(context: Context) : IMusicPlayer.Stub() {
                 songList.add(it)
                 musicPosition.size = songList.size
             }
+            if (songList.size == 1) {
+                playFrom(musicPosition.currentPosition)
+            }
+
         }
     }
 
@@ -143,6 +149,9 @@ class MyBinder(context: Context) : IMusicPlayer.Stub() {
                     } else {
                         musicPlayer.reset()
                     }
+                }
+                if (songList.size <= 0) {
+                    notifySongsNull()
                 }
             }
         }
@@ -160,9 +169,12 @@ class MyBinder(context: Context) : IMusicPlayer.Stub() {
         }
     }
 
+    override fun obtainData(): MutableList<Song> {
+        return songList
+    }
+
     override fun next() {
         musicPosition.nextPosition()
-        LogUtil.debug(tag, "current = ${musicPosition.currentPosition}")
         prepareToPlay(musicPosition.currentPosition)
     }
 
@@ -185,6 +197,10 @@ class MyBinder(context: Context) : IMusicPlayer.Stub() {
     }
 
     override fun receive(songs: MutableList<Song>?) {
+        musicPlayer.reset()
+        songList.clear()
+        musicPosition.size = 0
+        musicPosition.currentPosition = 0
         if (songs != null) {
             songList.addAll(songs)
             musicPosition.size = songList.size
@@ -246,6 +262,14 @@ class MyBinder(context: Context) : IMusicPlayer.Stub() {
             }
 
         }
+    }
+
+    private fun notifySongsNull() {
+        val count = callbackList.beginBroadcast()
+        for (i in 0 until count) {
+            callbackList.getBroadcastItem(i).closeBar()
+        }
+        callbackList.finishBroadcast()
     }
 
     private fun notifySongChange(song: Song) {

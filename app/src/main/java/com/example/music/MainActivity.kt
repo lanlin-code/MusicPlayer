@@ -9,18 +9,16 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
-import android.util.Log
 import android.view.View
+import android.view.Window
 import android.widget.*
 import androidx.fragment.app.Fragment
 import com.example.music.autoLogin.AutoLoginFragment
+import com.example.music.entity.PopOnClickListener
 import com.example.music.entity.Song
 import com.example.music.entity.User
 import com.example.music.entity.UserPlaylist
 import com.example.music.home.HomeFragment
-import com.example.music.login.LoginFragment
-import com.example.music.login.LoginModel
-import com.example.music.login.LoginPresenter
 import com.example.music.play.SongPlayFragment
 import com.example.music.search.SearchFragment
 import com.example.music.search.result.SearchResultFragment
@@ -37,6 +35,7 @@ class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener,
     private var loginSuccessListener: OnLoginSuccessListener? = null
     private var userPlaylists: MutableList<UserPlaylist> = mutableListOf()
     private var player: IMusicPlayer? = null
+    private lateinit var clickListener: PopOnClickListener
     private var connection: ServiceConnection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
 
@@ -53,25 +52,32 @@ class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener,
     private var musicCallback: IMusicCallback? = object : IMusicCallback.Stub() {
         override fun getCurrentSong(imgUrl: String?, name: String?) {
             handler.post {
-                playBar.visibility = View.VISIBLE
-                imgUrl?.let {
-                    if (it.isNotEmpty()) {
-                        Picasso.with(this@MainActivity).load(imgUrl)
-                            .placeholder(R.drawable.place_holder).error(R.drawable.place_holder).into(imageView)
+                if (currentFragment !is SongPlayFragment) {
+                    playBar.visibility = View.VISIBLE
+                    imgUrl?.let {
+                        if (it.isNotEmpty()) {
+                            Picasso.with(this@MainActivity).load(imgUrl)
+                                .placeholder(R.drawable.place_holder).error(R.drawable.place_holder).into(imageView)
+                        }
                     }
+                    textView.text = name
+                    playStatus.setImageResource(R.drawable.play)
                 }
-                textView.text = name
-                playStatus.setImageResource(R.drawable.play)
 
             }
         }
 
         override fun playCallback(position: Int) {
-
+            clickListener.onChange(position)
         }
 
         override fun obtainLrc(sid: Long) {
 
+        }
+
+        override fun closeBar() {
+            LogUtil.debug(TAG, "close bar")
+            playBar.visibility = View.GONE
         }
 
 
@@ -115,6 +121,9 @@ class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener,
                 }
             }
         }
+        clickListener = PopOnClickListener(this)
+        val popList = findViewById<ImageButton>(R.id.song_list)
+        popList.setOnClickListener(clickListener)
     }
 
     private fun startService() {
@@ -124,6 +133,7 @@ class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener,
 
     override fun onDestroy() {
         super.onDestroy()
+        clickListener.destroy()
         loginSuccessListener = null
         musicCallback = null
         player?.clearAllCallback()
@@ -147,6 +157,10 @@ class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener,
     private fun showPlayBar() {
         player?.let {
             if (it.showBar()) {
+                val song = it.currentPlaying()
+                Picasso.with(this).load(song.albumPic)
+                    .placeholder(R.drawable.place_holder).error(R.drawable.place_holder).into(imageView)
+                textView.text = song.name
                 if (it.isPlaying) {
                     playStatus.setImageResource(R.drawable.play)
                 } else {
@@ -229,7 +243,6 @@ class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener,
      */
     override fun onAutoLoginSuccess(user: User) {
         this.user = user
-        Log.d(TAG, "$user")
         setHome()
         loginSuccessListener?.onSuccess(user.avatar, this.applicationContext)
     }
@@ -277,6 +290,10 @@ class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener,
         toastErrorMessage(msg)
     }
 
+    override fun onObtainWindow(): Window {
+        return this.window
+    }
+
     override fun transmitData(songs: MutableList<Song>) {
         player?.clear()
         playBar.visibility = View.VISIBLE
@@ -303,5 +320,26 @@ class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener,
 
     override fun addAndPlay(song: Song) {
         player?.addAndPlay(song)
+    }
+
+    override fun obtainData(): MutableList<Song>? {
+        return player?.obtainData()
+    }
+
+    override fun transferMode(mode: Int) {
+        player?.mode(mode)
+    }
+
+    override fun mode(): Int? {
+        return player?.mode
+    }
+
+    override fun obtainCurrentPlaying(): Song? {
+        return player?.currentPlaying()
+    }
+
+
+    override fun removeItem(song: Song) {
+        player?.removeSong(song)
     }
 }

@@ -34,6 +34,7 @@ interface IMusicPlayer {
     void addSong(in Song song);
     void removeSong(in Song song);
     void addAndPlay(in Song song);
+    List<Song> obtainData();
 
 
 
