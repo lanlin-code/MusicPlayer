@@ -12,21 +12,27 @@ import android.widget.TextView
 import com.example.music.BaseFragment
 import com.example.music.LoadStatusListener
 import com.example.music.R
+import com.example.mylibrary.DataUtil
 
 class ShowUserStatusFragment: BaseFragment() {
 
     private var listener: LoadStatusListener? = null
+    private var logoutListener: LogoutListener? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         if (context is LoadStatusListener) {
             listener = context
         }
+        if (context is LogoutListener) {
+            logoutListener = context
+        }
     }
 
     override fun onDetach() {
         super.onDetach()
         listener = null
+        logoutListener = null
     }
 
     override fun onCreateView(
@@ -44,6 +50,14 @@ class ShowUserStatusFragment: BaseFragment() {
         val back = view.findViewById<ImageButton>(R.id.status_back)
         back.setOnClickListener { fragmentChangeListener?.onBackHome() }
         val logout = view.findViewById<Button>(R.id.logout)
+        logout.setOnClickListener {
+            DataUtil.loginImp.logout()
+            logoutListener?.logout()
+        }
         listener?.onLoadStatus(imageView, textView)
+    }
+
+    interface LogoutListener {
+        fun logout()
     }
 }

@@ -52,9 +52,13 @@ class LoginImplement : ClientLoginApi {
     }
 
     override fun logout() {
+        Log.d(tag, "log out")
         val o = loginAPI?.logout()
         o?.subscribeOn(Schedulers.io())?.observeOn(AndroidSchedulers.mainThread())
-            ?.subscribe( { Log.d(tag, "logout finish") }, {
+            ?.subscribe( {
+                Log.d(tag, "logout finish")
+                refreshLogin()
+            }, {
                 Log.d(tag, it.message, it)
             })
     }

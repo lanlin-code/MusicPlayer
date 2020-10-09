@@ -23,11 +23,12 @@ import com.example.music.play.SongPlayFragment
 import com.example.music.search.SearchFragment
 import com.example.music.search.result.SearchResultFragment
 import com.example.music.service.MyService
+import com.example.music.showUserStatus.ShowUserStatusFragment
 import com.example.music.util.LogUtil
 import com.squareup.picasso.Picasso
 
 class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener, AutoLoginCallback,
-    LoadStatusListener, LoadPlaylistListener, DataObtainListener, SongsListener {
+    LoadStatusListener, LoadPlaylistListener, DataObtainListener, SongsListener, ShowUserStatusFragment.LogoutListener {
 
     private lateinit var currentFragment: Fragment
     private var user: User = User()
@@ -341,5 +342,14 @@ class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener,
 
     override fun removeItem(song: Song) {
         player?.removeSong(song)
+    }
+
+    override fun logout() {
+        user = User()
+        val f = getHomeFragment()
+        if (f is HomeFragment) {
+            f.clear()
+        }
+        onBackHome()
     }
 }

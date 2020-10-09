@@ -68,6 +68,12 @@ class HomeFragment: Fragment(), MainActivity.OnLoginSuccessListener, ResponseCal
         return inflater.inflate(R.layout.fragment_home, container, false)
     }
 
+    fun clear() {
+        loginSuccess = false
+        avatar.setImageResource(R.drawable.avatar)
+        recyclerView.visibility = View.GONE
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         avatar = view.findViewById(R.id.avatar_iv)
