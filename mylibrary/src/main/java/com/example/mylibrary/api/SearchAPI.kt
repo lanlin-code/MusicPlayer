@@ -1,5 +1,6 @@
 package com.example.mylibrary.api
 
+import com.example.respository.bean.HotList
 import com.example.respository.bean.SearchDefaultJson
 import com.example.respository.bean.SearchSongJson
 import retrofit2.http.GET
@@ -14,4 +15,7 @@ interface SearchAPI {
 
     @GET("/search/default")
     fun getDefaultWord(): Observable<SearchDefaultJson>
+
+    @GET("search/hot/detail")
+    fun getHotList(): Observable<HotList>
 }

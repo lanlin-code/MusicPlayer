@@ -28,7 +28,7 @@ class PlaylistPresenter : RequestCallBack<UserPlayListJson> {
 
     override fun error(errorMsg: String) {
         LogUtil.debug(tag, errorMsg)
-        listener?.onError(errorMsg)
+        listener?.onError("歌单加载失败")
     }
 
 }

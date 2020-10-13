@@ -3,6 +3,9 @@ package com.example.mylibrary.implement
 import android.util.Log
 import com.example.mylibrary.RetrofitUtil
 import com.example.mylibrary.api.MusicAPI
+import com.example.respository.bean.DailyRecommendPlayList
+import com.example.respository.bean.RecommendNewSong
+import com.example.respository.bean.RecommendPlayList
 import com.example.respository.RequestCallBack
 import com.example.respository.api.ClientMusicApi
 import com.example.respository.bean.*
@@ -60,6 +63,18 @@ class MusicImplement : ClientMusicApi {
             Log.d(tag, it.message, it)
             it.message?.let { m -> callBack.error(m) }
         })
+    }
+
+    override fun getRecommendPlayList(limit: Int, callBack: RequestCallBack<RecommendPlayList>) {
+
+    }
+
+    override fun getDailyRecommendPlayList(callback: RequestCallBack<DailyRecommendPlayList>) {
+
+    }
+
+    override fun getRecommendNewSong(callback: RequestCallBack<RecommendNewSong>) {
+
     }
 
 

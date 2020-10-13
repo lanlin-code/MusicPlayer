@@ -1,45 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal" android:layout_width="match_parent"
+    android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:layout_marginEnd="5dp">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-        <ImageButton
+        <RelativeLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:id="@+id/search_back"
-            android:src="@drawable/back"
-            android:background="@android:color/transparent"/>
+            android:layout_height="50dp"
+            android:layout_marginEnd="5dp">
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:id="@+id/search_back"
+                android:src="@drawable/back"
+                android:background="@android:color/transparent"/>
 
 
-    </RelativeLayout>
+        </RelativeLayout>
 
-    <EditText
-        android:layout_width="0dp"
+        <EditText
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="50dp"
+            android:id="@+id/search_text"/>
+
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_marginStart="5dp">
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/search_pic"
+                android:background="@android:color/transparent"
+                android:layout_centerVertical="true"
+                android:id="@+id/search_bt"/>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textSize="20sp"
+        android:textColor="@android:color/black"
+        android:text="@string/hot_word"/>
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
         android:layout_weight="1"
-        android:layout_height="50dp"
-        android:id="@+id/search_text"/>
+        android:id="@+id/search_hot_list"/>
 
 
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:layout_marginStart="5dp">
 
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/search_pic"
-            android:background="@android:color/transparent"
-            android:layout_centerVertical="true"
-            android:id="@+id/search_bt"/>
-
-    </RelativeLayout>
 
 
 

@@ -52,13 +52,15 @@ class ResultPresenter(private val searchMessage: SearchMessage) : RequestCallBac
     }
 
     override fun error(errorMsg: String) {
-        listener?.onFail(errorMsg)
+        LogUtil.debug(tag, errorMsg)
+        listener?.onFail("加载失败")
     }
 
     inner class ResultSongPresenter: RequestCallBack<SongDetailJson> {
 
         override fun error(errorMsg: String) {
-            listener?.onFail(errorMsg)
+            LogUtil.debug(tag, errorMsg)
+            listener?.onFail("歌曲加载失败")
         }
 
         override fun callback(data: SongDetailJson) {

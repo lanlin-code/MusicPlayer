@@ -2,6 +2,7 @@ package com.example.mylibrary.implement
 
 import com.example.mylibrary.RetrofitUtil
 import com.example.mylibrary.api.SearchAPI
+import com.example.respository.bean.HotList
 import com.example.respository.RequestCallBack
 import com.example.respository.api.ClientSearchApi
 import com.example.respository.bean.SearchDefaultJson
@@ -29,5 +30,12 @@ class SearchImplement : ClientSearchApi {
         val o = searchApi.getDefaultWord()
         o.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
             .subscribe({ callBack.callback(it) }, { it.message?.let { m -> callBack.error(m) } })
+    }
+
+    override fun getHotList(callBack: RequestCallBack<HotList>) {
+        val o = searchApi.getHotList()
+        o.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).
+        subscribe({ callBack.callback(it) },
+            { it.message?.let { m -> callBack.error(m) } })
     }
 }

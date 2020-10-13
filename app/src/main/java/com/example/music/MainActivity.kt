@@ -81,6 +81,11 @@ class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener,
             playBar.visibility = View.GONE
         }
 
+        override fun playStatusChange(playing: Boolean) {
+            handler.post { updateStatus(playing) }
+
+        }
+
 
     }
 
@@ -142,16 +147,26 @@ class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener,
 
     override fun onBackPressed() {
         if (currentFragment !is HomeFragment) {
-            val h = getHomeFragment()
-            h?.let {
-                val t = supportFragmentManager.beginTransaction().hide(currentFragment).show(it)
-                showPlayBar()
-                t.remove(currentFragment)
-                t.commit()
-                currentFragment = it
-            }
+            onBackHome()
+//            val h = getHomeFragment()
+//            h?.let {
+//                val t = supportFragmentManager.beginTransaction().hide(currentFragment).show(it)
+//                showPlayBar()
+//                t.remove(currentFragment)
+//                t.commit()
+//                currentFragment = it
+//            }
         } else {
             super.onBackPressed()
+        }
+    }
+
+    private fun updateStatus(playing: Boolean) {
+        LogUtil.debug(TAG, "playing = $playing")
+        if (playing) {
+            playStatus.setImageResource(R.drawable.play)
+        } else {
+            playStatus.setImageResource(R.drawable.parse_48)
         }
     }
 
@@ -162,11 +177,12 @@ class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener,
                 Picasso.with(this).load(song.albumPic)
                     .placeholder(R.drawable.place_holder).error(R.drawable.place_holder).into(imageView)
                 textView.text = song.name
-                if (it.isPlaying) {
-                    playStatus.setImageResource(R.drawable.play)
-                } else {
-                    playStatus.setImageResource(R.drawable.parse_48)
-                }
+                updateStatus(it.isPlaying)
+//                if (it.isPlaying) {
+//                    playStatus.setImageResource(R.drawable.play)
+//                } else {
+//                    playStatus.setImageResource(R.drawable.parse_48)
+//                }
                 playBar.visibility = View.VISIBLE
             } else {
                 playBar.visibility = View.GONE

@@ -22,7 +22,8 @@ class LoginPresenter : RequestCallBack<UserJson> {
     }
 
     override fun error(errorMsg: String) {
-        listener?.onError(errorMsg)
+        LogUtil.debug(tag, errorMsg)
+        listener?.onError("登录失败")
     }
 
 

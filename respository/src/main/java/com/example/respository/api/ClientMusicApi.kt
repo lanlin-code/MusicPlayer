@@ -1,5 +1,8 @@
 package com.example.respository.api
 
+import com.example.respository.bean.DailyRecommendPlayList
+import com.example.respository.bean.RecommendNewSong
+import com.example.respository.bean.RecommendPlayList
 import com.example.respository.bean.SongDetailJson
 import com.example.respository.bean.SongPlayJson
 import com.example.respository.bean.UserPlayListJson
@@ -40,5 +43,23 @@ interface ClientMusicApi {
      * 获取歌曲的歌词.
      * */
     fun getSongLyric(id: Long, callBack: RequestCallBack<LyricJson>)
+
+    /**
+     * 获取推荐歌单，无需登录.
+     * url：baseUrl/personalized?limit=...
+     * */
+    fun getRecommendPlayList(limit : Int,callBack: RequestCallBack<RecommendPlayList>)
+
+    /**
+     * 获取每日推荐歌单，需要登录.
+     * url：baseUrl/recommend/resource
+     * */
+    fun getDailyRecommendPlayList(callback : RequestCallBack<DailyRecommendPlayList>)
+
+    /**
+     * 获取推荐的新音乐.
+     * url：baseUrl/personalized/newsong
+     * */
+    fun getRecommendNewSong(callback : RequestCallBack<RecommendNewSong>)
 
 }

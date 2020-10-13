@@ -13,6 +13,7 @@ class SongsPresenter {
     var listener: ResponseCallback<MutableList<Song>>? = null
     val idPresenter = SongsIdPresenter()
     val songPresenter = SongDetailPresenter()
+    val tag = "SongsPresenter"
 
 
     inner class SongsIdPresenter: RequestCallBack<SongIdsJson> {
@@ -40,7 +41,6 @@ class SongsPresenter {
                 }
             }
             ids = builder.toString()
-            LogUtil.debug("SongPresenter", ids)
          }
 
         override fun error(errorMsg: String) {
@@ -52,12 +52,12 @@ class SongsPresenter {
 
     inner class SongDetailPresenter: RequestCallBack<SongDetailJson> {
         override fun callback(data: SongDetailJson) {
-            LogUtil.debug("SongDetailPresenter", "callback")
             listener?.onSuccess(Song.valueOfList(data))
         }
 
         override fun error(errorMsg: String) {
-            listener?.onError(errorMsg)
+            LogUtil.debug(tag, errorMsg)
+            listener?.onError("加载失败")
         }
 
     }

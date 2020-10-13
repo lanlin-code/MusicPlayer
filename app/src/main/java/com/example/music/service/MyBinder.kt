@@ -1,11 +1,22 @@
 package com.example.music.service
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
+import android.graphics.Bitmap
 import android.media.MediaPlayer
+import android.os.Handler
+import android.os.Looper
 import android.os.RemoteCallbackList
+import android.widget.RemoteViews
 import android.widget.Toast
+import androidx.core.app.NotificationCompat
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.SimpleTarget
+import com.bumptech.glide.request.transition.Transition
 import com.example.music.IMusicCallback
 import com.example.music.IMusicPlayer
+import com.example.music.R
 import com.example.music.ResponseCallback
 import com.example.music.entity.Song
 import com.example.music.entity.SongData
@@ -15,7 +26,8 @@ import com.example.music.util.LogUtil
 import java.lang.Exception
 import java.util.concurrent.CopyOnWriteArrayList
 
-class MyBinder(context: Context) : IMusicPlayer.Stub() {
+class MyBinder(val context: Context,
+               var musicNotification: MusicNotification? = null) : IMusicPlayer.Stub() {
     private val tag = "MyBinder"
     private val presenter = SongPresenter()
     private val model = SongModel()
@@ -23,6 +35,7 @@ class MyBinder(context: Context) : IMusicPlayer.Stub() {
     private var musicPlayer = MediaPlayer()
     private val musicPosition = MusicPosition()
     private val callbackList = RemoteCallbackList<IMusicCallback>()
+    private val handler = Handler(Looper.getMainLooper())
 
 
     init {
@@ -79,6 +92,8 @@ class MyBinder(context: Context) : IMusicPlayer.Stub() {
     override fun parse() {
         if (musicPlayer.isPlaying) {
             musicPlayer.pause()
+            musicNotification?.updateState(false)
+            notifyPlayStatusChange(false)
         }
     }
 
@@ -209,7 +224,12 @@ class MyBinder(context: Context) : IMusicPlayer.Stub() {
     }
 
     override fun restart() {
-        musicPlayer.start()
+        if (!musicPlayer.isPlaying) {
+            musicPlayer.start()
+            musicNotification?.updateState(true)
+            notifyPlayStatusChange(true)
+        }
+
     }
 
     override fun clearAllCallback() {
@@ -246,25 +266,32 @@ class MyBinder(context: Context) : IMusicPlayer.Stub() {
 
     private fun play(position: Int) {
         if (position != musicPosition.currentPosition) return
-        musicPlayer.reset()
-        val song = songList[musicPosition.currentPosition]
-        if (song.errorUrl()) {
-            next()
-        } else {
-            notifySongChange(song)
-
-            val url = song.url
-            try {
-                musicPlayer.setDataSource(url)
-                musicPlayer.prepareAsync()
-            } catch (e: Exception) {
+        handler.post {
+            musicPlayer.reset()
+            val song = songList[musicPosition.currentPosition]
+            if (song.errorUrl()) {
                 next()
-            }
+            } else {
+                notifySongChange(song)
+                LogUtil.debug(tag, "name = ${song.name}")
+                LogUtil.debug(tag, "current thread is ${Thread.currentThread().name}")
+                val url = song.url
+                try {
+                    musicNotification?.onUpdate(song, true)
+                    musicPlayer.setDataSource(url)
+                    musicPlayer.prepareAsync()
+                } catch (e: Exception) {
+                    next()
+                }
 
+            }
         }
+
     }
 
     private fun notifySongsNull() {
+        LogUtil.debug(tag, "song list is empty")
+        musicNotification?.disappear()
         val count = callbackList.beginBroadcast()
         for (i in 0 until count) {
             callbackList.getBroadcastItem(i).closeBar()
@@ -285,6 +312,19 @@ class MyBinder(context: Context) : IMusicPlayer.Stub() {
 
     }
 
+
+
+    private fun notifyPlayStatusChange(playing: Boolean) {
+
+        val c = callbackList.beginBroadcast()
+        for (i in 0 until c) {
+            val callback = callbackList.getBroadcastItem(i)
+            callback.playStatusChange(playing)
+        }
+        callbackList.finishBroadcast()
+    }
+
+
     private fun loadUrl() {
         model.getSongUrl(songList[musicPosition.currentPosition].id, presenter)
     }
@@ -293,6 +333,8 @@ class MyBinder(context: Context) : IMusicPlayer.Stub() {
         if (musicPlayer.isPlaying) {
             musicPlayer.stop()
         }
+        musicNotification?.destroy()
+        musicNotification = null
         musicPlayer.release()
         presenter.listener = null
         clearAllCallback()

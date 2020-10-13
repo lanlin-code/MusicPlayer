@@ -66,13 +66,16 @@ class SongPlayFragment(var player: IMusicPlayer? = null): BaseFragment() {
         }
 
         override fun obtainLrc(sid: Long) {
-            LogUtil.debug(TAG, "sid = $sid")
             handler.post { model.lyric(sid, presenter) }
 
         }
 
         override fun closeBar() {
             fragmentChangeListener?.onBackHome()
+        }
+
+        override fun playStatusChange(playing: Boolean) {
+            handler.post { updateButtonState(playing) }
         }
 
 
@@ -271,7 +274,6 @@ class SongPlayFragment(var player: IMusicPlayer? = null): BaseFragment() {
                 name.text = it.name
                 artist.text = it.appendArtists()
 
-//                model.lyric(it.id, presenter)
             }
             player?.let {
                 val d = it.duration()

@@ -9,6 +9,7 @@ import com.example.respository.bean.LyricJson
 
 class SongPlayPresenter : RequestCallBack<LyricJson> {
     var responseCallback: ResponseCallback<MutableList<LrcRow>?>? = null
+    val tag = "SongPlayPresenter"
     private val parser = LrcParser()
     override fun callback(data: LyricJson) {
         data.lrc?.let {
@@ -19,7 +20,8 @@ class SongPlayPresenter : RequestCallBack<LyricJson> {
     }
 
     override fun error(errorMsg: String) {
-        responseCallback?.onError(errorMsg)
+        LogUtil.debug(tag, errorMsg)
+        responseCallback?.onError("歌词加载失败")
     }
 
 }

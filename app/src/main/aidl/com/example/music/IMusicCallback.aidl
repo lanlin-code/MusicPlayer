@@ -8,5 +8,6 @@ interface IMusicCallback {
     void playCallback(int position);
     void obtainLrc(long sid);
     void closeBar();
+    void playStatusChange(boolean playing);
 
 }

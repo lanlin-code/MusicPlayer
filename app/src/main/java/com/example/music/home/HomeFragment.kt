@@ -71,6 +71,7 @@ class HomeFragment: Fragment(), MainActivity.OnLoginSuccessListener, ResponseCal
     fun clear() {
         loginSuccess = false
         avatar.setImageResource(R.drawable.avatar)
+
         recyclerView.visibility = View.GONE
     }
 

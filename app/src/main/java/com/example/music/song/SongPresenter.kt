@@ -9,15 +9,16 @@ import com.example.respository.bean.SongPlayJson
 class SongPresenter: RequestCallBack<SongPlayJson> {
 
     var listener: ResponseCallback<MutableList<SongData>>? = null
+    val tag = "SongPresenter"
 
     override fun callback(data: SongPlayJson) {
-        LogUtil.debug("SongPresenter", Thread.currentThread().name)
         val list = SongData.valueOfList(data)
         listener?.onSuccess(list)
 
     }
 
     override fun error(errorMsg: String) {
-        listener?.onError(errorMsg)
+        LogUtil.debug(tag, errorMsg)
+        listener?.onError("加载失败")
     }
 }

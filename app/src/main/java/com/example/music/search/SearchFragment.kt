@@ -8,6 +8,8 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.music.BaseFragment
 import com.example.music.R
 import com.example.music.search.result.SearchResultFragment
@@ -16,6 +18,9 @@ class SearchFragment: BaseFragment() {
 
     private val defaultWordShow = DefaultWordShow()
     private val defaultSearchPresenter = DefaultSearchPresenter()
+    private lateinit var recyclerView: RecyclerView
+    private val hotWordShow = HotWordShow()
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -30,6 +35,11 @@ class SearchFragment: BaseFragment() {
         val back = view.findViewById<ImageButton>(R.id.search_back)
         val editText = view.findViewById<EditText>(R.id.search_text)
         val search = view.findViewById<ImageButton>(R.id.search_bt)
+        recyclerView = view.findViewById(R.id.search_hot_list)
+        recyclerView.layoutManager = LinearLayoutManager(view.context)
+        val adapter = HotWordAdapter()
+        adapter.listener = fragmentChangeListener
+        recyclerView.adapter = adapter
         back.setOnClickListener { fragmentChangeListener?.onBackHome() }
         search.setOnClickListener {
             val text = editText.text.toString()
@@ -41,15 +51,29 @@ class SearchFragment: BaseFragment() {
         }
         val defaultSearchModel = DefaultSearchModel()
         defaultWordShow.editText = editText
+        defaultWordShow.recyclerView = recyclerView
         defaultSearchPresenter.sListener = defaultWordShow
         defaultSearchModel.defaultWord(defaultSearchPresenter)
+        hotWordShow.recyclerView = recyclerView
+        val hotWordModel = HotWordModel()
+        val hotWordPresenter = HotWordPresenter()
+        hotWordPresenter.sListener = hotWordShow
+        hotWordModel.getHotList(hotWordPresenter)
+
+
 
 
     }
 
     override fun onDetach() {
+        super.onDetach()
         defaultWordShow.editText = null
         defaultSearchPresenter.sListener = null
-        super.onDetach()
+        defaultWordShow.recyclerView = null
+        if (recyclerView.adapter is HotWordAdapter) {
+            (recyclerView.adapter as HotWordAdapter).listener = null
+        }
+
+
     }
 }
