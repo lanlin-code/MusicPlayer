@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -16,6 +17,7 @@ import com.example.music.*
 import com.example.music.banner.BannerAdapter
 import com.example.music.banner.BannerModel
 import com.example.music.banner.BannerPresenter
+import com.example.music.downloader.DownloadMangerFragment
 import com.example.music.entity.Banners
 import com.example.music.login.LoginFragment
 import com.example.music.playlist.PlaylistCallback
@@ -87,6 +89,8 @@ class HomeFragment: Fragment(), MainActivity.OnLoginSuccessListener, ResponseCal
         }
         val searchButton = view.findViewById<ImageButton>(R.id.home_search_button)
         searchButton.setOnClickListener { listener?.onFragmentChange(SearchFragment()) }
+        val downloadButton = view.findViewById<Button>(R.id.home_download_button)
+        downloadButton.setOnClickListener { listener?.onFragmentChange(DownloadMangerFragment()) }
         bannerView = view.findViewById(R.id.banner)
         bannerDots = view.findViewById(R.id.banner_dots)
         recyclerView = view.findViewById(R.id.all_playlists)

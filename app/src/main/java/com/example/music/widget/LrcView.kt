@@ -218,7 +218,7 @@ class LrcView : View {
      * 计算手指的纵偏移量，根据偏移量来寻找当前被选中的歌词。
      * @param event 拖动事件
      */
-    fun onLrcMove(event: MotionEvent) {
+    private fun onLrcMove(event: MotionEvent) {
         val size = lrcRow?.size
         if (size == null || size == 0) {
             return
@@ -229,14 +229,12 @@ class LrcView : View {
         if (abs(offsetY) < minOffset) {
             return
         }
-        val offsetRow = (offsetY / textHeight).toInt()
-        if (offsetRow > 0) {
-            lastY = currentY
-            dragRow += offsetRow
-            dragRow = max(0, dragRow)
-            dragRow = min(dragRow, size - 1)
-            invalidate()
-        }
+        val offsetRow = (-offsetY / textHeight).toInt()
+        lastY = currentY
+        dragRow += offsetRow
+        dragRow = max(0, dragRow)
+        dragRow = min(dragRow, size - 1)
+        invalidate()
     }
 
     fun moveToTime(time: Long) {

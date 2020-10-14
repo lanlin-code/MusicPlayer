@@ -135,7 +135,6 @@ class SongPlayFragment(var player: IMusicPlayer? = null): BaseFragment() {
         val timeText = view.findViewById<TextView>(R.id.play_lrc_time)
         centerLayout.setOnClickListener {
             if (songImg.visibility == View.VISIBLE) {
-                LogUtil.debug(TAG, "click")
                 songImg.clearAnimation()
                 songImg.visibility = View.GONE
                 lrcView.visibility = View.VISIBLE
@@ -143,6 +142,9 @@ class SongPlayFragment(var player: IMusicPlayer? = null): BaseFragment() {
                 songImg.startAnimation()
                 songImg.visibility = View.VISIBLE
                 lrcView.visibility = View.GONE
+                touchPlay.visibility = View.GONE
+                timeText.visibility = View.GONE
+
             }
         }
         touchPlay.setOnClickListener {

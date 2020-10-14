@@ -10,12 +10,13 @@ import com.bumptech.glide.Glide
 import com.example.music.R
 import com.example.music.SongsListener
 import com.example.music.entity.Song
+import com.example.music.util.DownLoader
 
 
 class PopListAdapter(var songsListener: SongsListener? = null, val song: Song) : RecyclerView.Adapter<PopListAdapter.PopListHolder>() {
 
-    private val imageSource = arrayOf(R.drawable.add_to_next)
-    private val textSource = arrayOf(R.string.next_to_play)
+    private val imageSource = arrayOf(R.drawable.add_to_next, R.drawable.download)
+    private val textSource = arrayOf(R.string.next_to_play, R.string.download)
     var listener: PopListDismissListener? = null
 
     class PopListHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -32,6 +33,10 @@ class PopListAdapter(var songsListener: SongsListener? = null, val song: Song) :
         when(position) {
             0 -> holder.itemView.setOnClickListener {
                 songsListener?.addToNext(song)
+                listener?.onDismiss()
+            }
+            1 -> holder.itemView.setOnClickListener {
+                DownLoader.addTask(song)
                 listener?.onDismiss()
             }
         }
