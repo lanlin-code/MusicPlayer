@@ -69,7 +69,8 @@ class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener,
         }
 
         override fun playCallback(position: Int) {
-            clickListener.onChange(position)
+            handler.post { clickListener.onChange(position) }
+
         }
 
         override fun obtainLrc(sid: Long) {
@@ -77,8 +78,8 @@ class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener,
         }
 
         override fun closeBar() {
-            LogUtil.debug(TAG, "close bar")
-            playBar.visibility = View.GONE
+            handler.post { playBar.visibility = View.GONE }
+
         }
 
         override fun playStatusChange(playing: Boolean) {

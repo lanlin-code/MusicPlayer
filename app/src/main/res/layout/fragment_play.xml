@@ -17,7 +17,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:id="@+id/play_back"
-                android:src="@drawable/back"
+                android:src="@drawable/back_white"
                 android:background="@android:color/transparent"/>
 
             <LinearLayout
@@ -36,6 +36,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_weight="2"
+                        android:textColor="@android:color/white"
                         android:text="@string/unknown"
                         android:id="@+id/play_name"
                         android:textSize="20sp"/>
@@ -44,6 +45,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_weight="1"
+                        android:textColor="@android:color/white"
                         android:text="@string/unknown"
                         android:id="@+id/play_artist"/>
 
@@ -103,6 +105,7 @@
                         android:layout_height="wrap_content"
                         android:id="@+id/play_lrc_time"
                         android:visibility="gone"
+                        android:textColor="@android:color/white"
                         android:layout_marginStart="20dp"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
@@ -126,12 +129,14 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:id="@+id/play_current_time"
+                        android:textColor="@android:color/white"
                         android:text="@string/time_start"/>
 
                     <SeekBar
                         android:layout_width="0dp"
                         android:layout_weight="1"
                         android:layout_height="wrap_content"
+
                         android:layout_gravity="center"
                         android:id="@+id/play_seek_bar"/>
 
@@ -139,6 +144,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
+                        android:textColor="@android:color/white"
                         android:id="@+id/play_duration"
                         android:text="@string/time_start"/>
 

@@ -55,14 +55,14 @@ class SongPlayFragment(var player: IMusicPlayer? = null): BaseFragment() {
         }
 
         override fun playCallback(position: Int) {
-            handler.postDelayed({
+            handler.post {
                 player?.let {
                     if (it.updateLayout(position)) {
                         updateLayout()
                         clickListener.onChange(position)
                     }
                 }
-            }, updateDelay)
+            }
         }
 
         override fun obtainLrc(sid: Long) {
@@ -71,7 +71,8 @@ class SongPlayFragment(var player: IMusicPlayer? = null): BaseFragment() {
         }
 
         override fun closeBar() {
-            fragmentChangeListener?.onBackHome()
+            handler.post { fragmentChangeListener?.onBackHome() }
+
         }
 
         override fun playStatusChange(playing: Boolean) {
@@ -124,7 +125,9 @@ class SongPlayFragment(var player: IMusicPlayer? = null): BaseFragment() {
         name = view.findViewById(R.id.play_name)
         artist = view.findViewById(R.id.play_artist)
         songImg = view.findViewById(R.id.play_image)
-        songImg.start = true
+        songImg.rotation = true
+        songImg.resumeAnimation()
+//        songImg.start = true
         currentTime = view.findViewById(R.id.play_current_time)
         seekBar = view.findViewById(R.id.play_seek_bar)
         duration = view.findViewById(R.id.play_duration)
@@ -135,11 +138,11 @@ class SongPlayFragment(var player: IMusicPlayer? = null): BaseFragment() {
         val timeText = view.findViewById<TextView>(R.id.play_lrc_time)
         centerLayout.setOnClickListener {
             if (songImg.visibility == View.VISIBLE) {
-                songImg.clearAnimation()
+//                songImg.clearAnimation()
                 songImg.visibility = View.GONE
                 lrcView.visibility = View.VISIBLE
             } else {
-                songImg.startAnimation()
+//                songImg.startAnimation()
                 songImg.visibility = View.VISIBLE
                 lrcView.visibility = View.GONE
                 touchPlay.visibility = View.GONE
@@ -214,8 +217,10 @@ class SongPlayFragment(var player: IMusicPlayer? = null): BaseFragment() {
 
     private fun updateButtonState(playing: Boolean) {
         if (playing) {
+            songImg.resumeAnimation()
             playState.setImageResource(R.drawable.play)
         } else {
+            songImg.pauseAnimation()
             playState.setImageResource(R.drawable.parse_48)
         }
     }
@@ -303,6 +308,7 @@ class SongPlayFragment(var player: IMusicPlayer? = null): BaseFragment() {
         player?.unregisterCallback(callback)
         callback = null
         player = null
+        songImg.pauseAnimation()
         songImg.clearAnimation()
         dragListener.clear()
         timer.cancel()

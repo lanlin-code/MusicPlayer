@@ -29,7 +29,7 @@ class Song(
 
 
 
-    fun errorUrl(): Boolean = url == errorString
+    fun errorUrl(): Boolean = url.isEmpty()
 
 
 

@@ -8,6 +8,7 @@ import android.media.MediaPlayer
 import android.os.Handler
 import android.os.Looper
 import android.os.RemoteCallbackList
+import android.util.Log
 import android.widget.RemoteViews
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
@@ -35,23 +36,27 @@ class MyBinder(val context: Context,
     private var musicPlayer = MediaPlayer()
     private val musicPosition = MusicPosition()
     private val callbackList = RemoteCallbackList<IMusicCallback>()
-    private val handler = Handler(Looper.getMainLooper())
+    private var prepared = false
 
 
     init {
         musicPlayer.setOnPreparedListener {
             musicPlayer.start()
+            prepared = true
+            val song = songList[musicPosition.currentPosition]
+            notifySongChange(song)
         }
         musicPlayer.setOnCompletionListener {
             next()
         }
         musicPlayer.setOnErrorListener { mp, what, extra ->
-            Toast.makeText(context.applicationContext, "当前歌曲播放失败", Toast.LENGTH_SHORT).show()
-            false
+            LogUtil.error(tag, "---- error code = $what -------")
+            Toast.makeText(context.applicationContext, "error code is $what", Toast.LENGTH_SHORT).show()
+//            Toast.makeText(context.applicationContext, "当前歌曲播放失败", Toast.LENGTH_SHORT).show()
+            true
         }
         presenter.listener = object : ResponseCallback<MutableList<SongData>> {
             override fun onSuccess(data: MutableList<SongData>) {
-                LogUtil.debug(tag, data.toString())
                 if (data.size <= 0) {
                     Toast.makeText(context.applicationContext, "加载失败", Toast.LENGTH_SHORT).show()
                     next()
@@ -67,8 +72,10 @@ class MyBinder(val context: Context,
                         }
                     }
                 }
+//                LogUtil.debug(tag, "currentPosition = ${musicPosition.currentPosition}, position = $position")
                 if (position >= 0) {
                     play(position)
+
                 }
 
             }
@@ -194,11 +201,21 @@ class MyBinder(val context: Context,
     }
 
     override fun currentPosition(): Int {
-        return musicPlayer.currentPosition
+        return if (prepared) {
+            musicPlayer.currentPosition
+        } else {
+            0
+        }
     }
 
     override fun duration(): Int {
-        return musicPlayer.duration
+
+        return if (prepared) {
+            musicPlayer.duration
+        } else {
+            0
+        }
+
     }
 
     override fun playFrom(position: Int) {
@@ -257,6 +274,7 @@ class MyBinder(val context: Context,
     private fun prepareToPlay(position: Int) {
         if (position != musicPosition.currentPosition) return
         val song = songList[musicPosition.currentPosition]
+
         if (song.errorUrl()) {
             loadUrl()
         } else {
@@ -265,32 +283,35 @@ class MyBinder(val context: Context,
     }
 
     private fun play(position: Int) {
-        if (position != musicPosition.currentPosition) return
-        handler.post {
-            musicPlayer.reset()
-            val song = songList[musicPosition.currentPosition]
-            if (song.errorUrl()) {
-                next()
-            } else {
-                notifySongChange(song)
-                LogUtil.debug(tag, "name = ${song.name}")
-                LogUtil.debug(tag, "current thread is ${Thread.currentThread().name}")
-                val url = song.url
-                try {
-                    musicNotification?.onUpdate(song, true)
-                    musicPlayer.setDataSource(url)
-                    musicPlayer.prepareAsync()
-                } catch (e: Exception) {
-                    next()
-                }
 
+        if (position != musicPosition.currentPosition) return
+        prepared = false
+        val song = songList[musicPosition.currentPosition]
+//        LogUtil.debug(tag, "name = ${song.name}, url = ${song.url}, id = ${song.id}")
+
+        if (song.errorUrl()) {
+            LogUtil.error(tag, "error")
+            next()
+        } else {
+
+            val url = song.url
+            try {
+                musicPlayer.reset()
+                musicPlayer.setDataSource(url)
+                musicPlayer.prepareAsync()
+                musicNotification?.onUpdate(song, true)
+
+            } catch (e: Exception) {
+                LogUtil.error(tag, "Music Exception")
+                Log.d(tag, e.message, e)
+                next()
             }
+
         }
 
     }
 
     private fun notifySongsNull() {
-        LogUtil.debug(tag, "song list is empty")
         musicNotification?.disappear()
         val count = callbackList.beginBroadcast()
         for (i in 0 until count) {

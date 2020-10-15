@@ -1,5 +1,7 @@
 package com.example.music.widget
 
+import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
@@ -16,7 +18,16 @@ import android.widget.ImageView
 class RoundAnimationImageView : androidx.appcompat.widget.AppCompatImageView {
 
     private val paint: Paint = Paint()
-    var start = false
+    private var init = false
+    var rotation = false
+    private val animation: ObjectAnimator = ObjectAnimator.ofFloat(this, "rotation", 0f, 360f)
+
+    init {
+        init = true
+        if (rotation) animation.start()
+    }
+
+
 
     constructor(context: Context) : super(context)
 
@@ -26,49 +37,62 @@ class RoundAnimationImageView : androidx.appcompat.widget.AppCompatImageView {
 
     init {
         paint.isAntiAlias = true
-        if (start) {
-            startAnimation()
+        animation.duration = 30000L
+        animation.repeatCount = ValueAnimator.INFINITE
+        animation.repeatMode = ValueAnimator.RESTART
+        animation.interpolator = LinearInterpolator()
+    }
+
+   private fun startAnimation() {
+       if (!init) {
+           init = true
+           return
+       }
+       if (rotation) {
+           if (animation.isStarted) {
+               animation.pause()
+           }
+           animation.start()
+       }
+
+   }
+
+    fun pauseAnimation() {
+        if (animation.isStarted) {
+            animation.pause()
         }
     }
 
-   fun startAnimation() {
-        clearAnimation()
-        val duration = 30000L
-        val rotateAnimation = RotateAnimation(0f, 360f, Animation.RELATIVE_TO_SELF,
-            0.5f, Animation.RELATIVE_TO_SELF, 0.5f)
-        rotateAnimation.duration = duration
-        rotateAnimation.interpolator = LinearInterpolator()
-        rotateAnimation.repeatCount = Animation.INFINITE
-        rotateAnimation.repeatMode = Animation.RESTART
-        startAnimation(rotateAnimation)
+    fun resumeAnimation() {
+        if (animation.isPaused) {
+            animation.resume()
+        }
     }
+
+
 
     override fun setImageResource(resId: Int) {
         super.setImageResource(resId)
-        if (start) {
-            startAnimation()
-        }
+        startAnimation()
+
     }
 
     override fun setImageDrawable(drawable: Drawable?) {
         super.setImageDrawable(drawable)
-        if (start) {
-            startAnimation()
-        }
+        startAnimation()
+
     }
 
     override fun setImageBitmap(bm: Bitmap?) {
         super.setImageBitmap(bm)
-        if (start) {
-            startAnimation()
-        }
+        startAnimation()
+
     }
 
     override fun setImageURI(uri: Uri?) {
         super.setImageURI(uri)
-        if (start) {
-            startAnimation()
-        }
+        startAnimation()
+
     }
 
 

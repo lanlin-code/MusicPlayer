@@ -41,6 +41,7 @@ class SongData(var id: Long = errorLong,
 
     fun error() = id == errorLong || url == errorMessage
 
-
-
+    override fun toString(): String {
+        return "id = $id, url = $url"
+    }
 }
