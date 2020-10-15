@@ -29,6 +29,11 @@ class PopListAdapter(var songsListener: SongsListener? = null, val song: Song) :
         return PopListHolder(view)
     }
 
+    /**
+     * 0 -> 添加到下一首播放
+     * 1 -> 下载歌曲
+     */
+
     override fun onBindViewHolder(holder: PopListHolder, position: Int) {
         when(position) {
             0 -> holder.itemView.setOnClickListener {

@@ -120,12 +120,15 @@ class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener,
         playStatus.setOnClickListener {
             player?.let {
                 if (it.isPlaying) {
-                    it.parse()
-                    playStatus.setImageResource(R.drawable.parse_48)
-                } else {
-                    it.restart()
-                    playStatus.setImageResource(R.drawable.play)
+                    if (it.isPlaying) {
+                        it.parse()
+                        playStatus.setImageResource(R.drawable.parse_48)
+                    } else {
+                        it.restart()
+                        playStatus.setImageResource(R.drawable.play)
+                    }
                 }
+
             }
         }
         clickListener = PopOnClickListener(this)
@@ -149,14 +152,6 @@ class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener,
     override fun onBackPressed() {
         if (currentFragment !is HomeFragment) {
             onBackHome()
-//            val h = getHomeFragment()
-//            h?.let {
-//                val t = supportFragmentManager.beginTransaction().hide(currentFragment).show(it)
-//                showPlayBar()
-//                t.remove(currentFragment)
-//                t.commit()
-//                currentFragment = it
-//            }
         } else {
             super.onBackPressed()
         }
@@ -179,11 +174,7 @@ class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener,
                     .placeholder(R.drawable.place_holder).error(R.drawable.place_holder).into(imageView)
                 textView.text = song.name
                 updateStatus(it.isPlaying)
-//                if (it.isPlaying) {
-//                    playStatus.setImageResource(R.drawable.play)
-//                } else {
-//                    playStatus.setImageResource(R.drawable.parse_48)
-//                }
+
                 playBar.visibility = View.VISIBLE
             } else {
                 playBar.visibility = View.GONE

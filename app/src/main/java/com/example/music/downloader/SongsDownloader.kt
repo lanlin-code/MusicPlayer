@@ -17,6 +17,7 @@ class SongsDownloader(var adapter: DownloadAdapter? = null,
     private val handler = Handler(Looper.getMainLooper())
     private val tag = "SongsDownloader"
 
+    // 更新进度
     override fun onProgress(position: Int, currentPosition: Int, total: Long) {
         handler.post {
             adapter?.holderList?.get(position)?.progressBar?.max = total.toInt()
@@ -30,6 +31,7 @@ class SongsDownloader(var adapter: DownloadAdapter? = null,
 
     }
 
+    // 下载完成后清除相应的视图
     override fun onSuccess(msg: String, position: Int) {
         handler.post {
             adapter?.holderList?.removeAt(position)

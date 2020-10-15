@@ -50,16 +50,14 @@ class MyBinder(val context: Context,
             next()
         }
         musicPlayer.setOnErrorListener { mp, what, extra ->
-            LogUtil.error(tag, "---- error code = $what -------")
-            Toast.makeText(context.applicationContext, "error code is $what", Toast.LENGTH_SHORT).show()
-//            Toast.makeText(context.applicationContext, "当前歌曲播放失败", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context.applicationContext, "当前歌曲播放失败", Toast.LENGTH_SHORT).show()
             true
         }
         presenter.listener = object : ResponseCallback<MutableList<SongData>> {
             override fun onSuccess(data: MutableList<SongData>) {
                 if (data.size <= 0) {
                     Toast.makeText(context.applicationContext, "加载失败", Toast.LENGTH_SHORT).show()
-                    next()
+//                    next()
                 }
                 var position = -1
                 for (d in data) {
@@ -93,11 +91,12 @@ class MyBinder(val context: Context,
         songList.clear()
         musicPosition.size = 0
         musicPosition.currentPosition = 0
+
         notifySongsNull()
     }
 
     override fun parse() {
-        if (musicPlayer.isPlaying) {
+        if (musicPlayer.isPlaying && prepared) {
             musicPlayer.pause()
             musicNotification?.updateState(false)
             notifyPlayStatusChange(false)
@@ -195,6 +194,10 @@ class MyBinder(val context: Context,
         return songList
     }
 
+    override fun isPrepared(): Boolean {
+        return prepared
+    }
+
     override fun next() {
         musicPosition.nextPosition()
         prepareToPlay(musicPosition.currentPosition)
@@ -241,7 +244,7 @@ class MyBinder(val context: Context,
     }
 
     override fun restart() {
-        if (!musicPlayer.isPlaying) {
+        if (!musicPlayer.isPlaying && prepared) {
             musicPlayer.start()
             musicNotification?.updateState(true)
             notifyPlayStatusChange(true)

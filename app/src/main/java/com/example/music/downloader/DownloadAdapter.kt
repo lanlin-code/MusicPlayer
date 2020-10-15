@@ -13,18 +13,18 @@ import com.example.music.entity.Song
 import com.example.music.util.DownLoader
 
 class DownloadAdapter : RecyclerView.Adapter<DownloadAdapter.DownloadHolder>() {
-
+    // 获取下载列表的数据
     private var data: MutableList<Song>? = DownLoader.getDownloadData()
     val holderList = mutableListOf<DownloadHolder>()
 
 
     class DownloadHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val name: TextView = itemView.findViewById(R.id.download_item_name)
+        val name: TextView = itemView.findViewById(R.id.download_item_name) // 歌曲名
         val layout: LinearLayout = itemView.findViewById(R.id.download_progress_layout)
-        val clickText: TextView = itemView.findViewById(R.id.download_click)
-        val progressText: TextView = itemView.findViewById(R.id.download_progress_text)
-        val progressBar: ProgressBar = itemView.findViewById(R.id.download_progress)
-        val deleteButton: ImageButton = itemView.findViewById(R.id.download_delete)
+        val clickText: TextView = itemView.findViewById(R.id.download_click) // 暂停下载时显示
+        val progressText: TextView = itemView.findViewById(R.id.download_progress_text) // 下载进度
+        val progressBar: ProgressBar = itemView.findViewById(R.id.download_progress) // 进度条
+        val deleteButton: ImageButton = itemView.findViewById(R.id.download_delete) // 清除下载任务
     }
 
     fun clear() {

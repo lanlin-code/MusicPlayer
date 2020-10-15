@@ -45,7 +45,6 @@ class SongPlayFragment(var player: IMusicPlayer? = null): BaseFragment() {
     private var drag = false
     private lateinit var clickListener: PopOnClickListener
     private val timerPeriod = 100L
-    private val updateDelay = 1000L
     private var timer = Timer()
     private val timerHandler = Handler(Looper.getMainLooper())
     private val handler = Handler(Looper.getMainLooper())
@@ -126,7 +125,14 @@ class SongPlayFragment(var player: IMusicPlayer? = null): BaseFragment() {
         artist = view.findViewById(R.id.play_artist)
         songImg = view.findViewById(R.id.play_image)
         songImg.rotation = true
-        songImg.resumeAnimation()
+        player?.let {
+            if (it.isPlaying) {
+                songImg.resumeAnimation()
+            } else {
+                songImg.pauseAnimation()
+            }
+        }
+
 //        songImg.start = true
         currentTime = view.findViewById(R.id.play_current_time)
         seekBar = view.findViewById(R.id.play_seek_bar)
@@ -139,10 +145,12 @@ class SongPlayFragment(var player: IMusicPlayer? = null): BaseFragment() {
         centerLayout.setOnClickListener {
             if (songImg.visibility == View.VISIBLE) {
 //                songImg.clearAnimation()
+                songImg.pauseAnimation()
                 songImg.visibility = View.GONE
                 lrcView.visibility = View.VISIBLE
             } else {
 //                songImg.startAnimation()
+                songImg.resumeAnimation()
                 songImg.visibility = View.VISIBLE
                 lrcView.visibility = View.GONE
                 touchPlay.visibility = View.GONE
@@ -196,13 +204,17 @@ class SongPlayFragment(var player: IMusicPlayer? = null): BaseFragment() {
         player?.let { updateButtonState(it.isPlaying) }
         playState.setOnClickListener {
             player?.let {
-                val b = it.isPlaying
-                if (b) {
-                    it.parse()
-                } else {
-                    it.restart()
+                val p = it.isPrepared
+                if (p) {
+                    val b = it.isPlaying
+                    if (b) {
+                        it.parse()
+                    } else {
+                        it.restart()
+                    }
+                    updateButtonState(!b)
                 }
-                updateButtonState(!b)
+
             }
         }
     }

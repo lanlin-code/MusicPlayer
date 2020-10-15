@@ -44,7 +44,7 @@ class SearchResultFragment(var searchText: String = "", val hint: String = "") :
         super.onViewCreated(view, savedInstanceState)
         val back = view.findViewById<ImageButton>(R.id.result_back)
         back.setOnClickListener { fragmentChangeListener?.onBackHome() }
-        editText = view.findViewById<EditText>(R.id.result_text)
+        editText = view.findViewById(R.id.result_text)
         editText.hint = hint
         if (searchText.isNotEmpty()) {
             editText.setText(searchText, TextView.BufferType.EDITABLE)

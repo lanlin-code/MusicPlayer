@@ -2,6 +2,10 @@ package com.example.music.entity
 
 import com.example.respository.bean.SearchDefaultJson
 
+/**
+ * 默认搜索词实体类
+ */
+
 class DefaultSearchWord(var real: String = "", var show: String = "") {
 
     companion object {

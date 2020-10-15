@@ -37,7 +37,6 @@ class MusicNotification(val context: Context,
     private val tag = "MusicNotification"
     private val builder: NotificationCompat.Builder
     private val notification: Notification
-    private val client = OkHttpClient()
     private val handler = Handler(Looper.getMainLooper())
 
 
@@ -63,10 +62,13 @@ class MusicNotification(val context: Context,
     fun isShow() = !disappear
 
     fun onUpdate(song: Song, isPlaying: Boolean) {
-        remoteViews?.setTextViewText(R.id.notification_name, song.name)
-        remoteViews?.setTextViewText(R.id.notification_artist, song.appendArtists())
-        Picasso.with(context).load(song.albumPic).into(remoteViews, R.id.notification_image, 1, notification)
-        updateState(isPlaying)
+        handler.post {
+            remoteViews?.setTextViewText(R.id.notification_name, song.name)
+            remoteViews?.setTextViewText(R.id.notification_artist, song.appendArtists())
+            Picasso.with(context).load(song.albumPic).into(remoteViews, R.id.notification_image, 1, notification)
+            updateState(isPlaying)
+        }
+
 
 
 //        val target = object : SimpleTarget<Bitmap>() {

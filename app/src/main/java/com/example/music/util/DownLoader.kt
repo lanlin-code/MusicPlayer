@@ -40,6 +40,7 @@ object DownLoader {
                 for (d in data) {
                     if (d.error()) {
                         Toast.makeText(MusicApplication.context, failString, Toast.LENGTH_SHORT).show()
+
                         break
                     }
                     for (s in cacheList) {

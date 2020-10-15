@@ -2,6 +2,10 @@ package com.example.music.entity
 
 import com.example.respository.bean.HotList
 
+/**
+ * 搜索热词
+ */
+
 class HotWord(var searchWord: String = ERROR_STRING,
               var score: Long = ERROR_LONG,
               var content: String = ERROR_STRING,
