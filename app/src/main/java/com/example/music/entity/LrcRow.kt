@@ -2,7 +2,10 @@ package com.example.music.entity
 
 import android.text.TextUtils
 
-class LrcRow(val content: String?, val strTime: String?, val time: Long): Comparable<LrcRow> {
+class LrcRow(val content: String?, // 歌词内容
+             val strTime: String?, // 歌词时间字符串
+             val time: Long // 歌词时间
+): Comparable<LrcRow> {
 
     var timeText: String = "00:00"
 
@@ -14,6 +17,7 @@ class LrcRow(val content: String?, val strTime: String?, val time: Long): Compar
         }
     }
 
+    // 按时间排序
     override fun compareTo(other: LrcRow): Int {
         return (time - other.time).toInt()
     }
@@ -24,6 +28,7 @@ class LrcRow(val content: String?, val strTime: String?, val time: Long): Compar
 
     companion object {
         fun createRows(standardLrc: String?) : List<LrcRow>? {
+            // 检查数据是否是标准lrc歌词
             if (standardLrc == null || standardLrc.isEmpty() ||
                 standardLrc.indexOf("[") != 0 || (standardLrc.indexOf("]") != 9
                         && standardLrc.indexOf("]") != 10)) {
@@ -47,6 +52,7 @@ class LrcRow(val content: String?, val strTime: String?, val time: Long): Compar
 
         }
 
+        // 将表示时间的字符串转为Long
         private fun translateTime(timeString: String) : Long {
             val s = timeString.replace(".", ":")
             val arrTime = s.split(":")

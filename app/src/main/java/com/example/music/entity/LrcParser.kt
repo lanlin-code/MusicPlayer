@@ -7,6 +7,10 @@ import java.io.IOException
 import java.io.StringReader
 import java.util.*
 
+/**
+ * 歌词解析类
+ */
+
 class LrcParser : Parser<LrcRow> {
     override fun parse(resource: String): MutableList<LrcRow>? {
         if(resource.isEmpty()) {

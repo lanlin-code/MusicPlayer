@@ -46,6 +46,7 @@ class OuterAdapter(var data: MutableMap<String, MutableList<Song>>? = null, var 
         fun getSongsListener(): SongsListener?
     }
 
+    // 计算选择歌曲在播放列表中的位置
     private fun getClickPosition(listPosition: Int, songPosition: Int): Int {
         var position: Int = songPosition
         for (i in 0 until listPosition) {
@@ -58,6 +59,7 @@ class OuterAdapter(var data: MutableMap<String, MutableList<Song>>? = null, var 
         return position
     }
 
+    // 获取所有歌曲
     private fun getSongs(): MutableList<Song> {
         val count = title?.size
         val songs = mutableListOf<Song>()

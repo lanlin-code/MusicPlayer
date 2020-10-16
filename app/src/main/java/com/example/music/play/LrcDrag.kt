@@ -9,9 +9,11 @@ import android.widget.TextView
 import com.example.music.util.LogUtil
 import com.example.music.widget.LrcView
 
-class LrcDrag(var touchPlay: ImageButton? = null,
-              var textView: TextView? = null,
-              var lrcView: LrcView? = null): LrcView.DragListener {
+class LrcDrag(var touchPlay: ImageButton? = null, // 拖动时出现的播放按钮
+              var textView: TextView? = null, // 显示时间
+              var lrcView: LrcView? = null // 显示歌词的view
+): LrcView.DragListener {
+
     private val handler = object : Handler(Looper.getMainLooper()) {
         override fun handleMessage(msg: Message) {
             val t: Long = msg.obj as Long
@@ -23,8 +25,10 @@ class LrcDrag(var touchPlay: ImageButton? = null,
             }
         }
     }
+
     private val delayTime = 2000L
     private var sendTime: Long = 0L
+    // 歌词拖动时按钮和显示时间的textView可见
     override fun onMove(time: String) {
         touchPlay?.visibility = View.VISIBLE
         textView?.text = time

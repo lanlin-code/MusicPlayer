@@ -2,7 +2,11 @@ package com.example.music.entity
 
 import com.example.respository.bean.UserJson
 
-class User() {
+/**
+ * 用户信息实体类
+ */
+
+class User {
     var avatar: String = ""
     var nickname: String = ""
     var userId: Long = -1L

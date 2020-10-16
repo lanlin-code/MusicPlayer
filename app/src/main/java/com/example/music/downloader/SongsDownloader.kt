@@ -34,6 +34,7 @@ class SongsDownloader(var adapter: DownloadAdapter? = null,
     // 下载完成后清除相应的视图
     override fun onSuccess(msg: String, position: Int) {
         handler.post {
+            Toast.makeText(MusicApplication.context, msg, Toast.LENGTH_SHORT).show()
             adapter?.holderList?.removeAt(position)
             adapter?.notifyItemRemoved(position)
             if (!DownLoader.hasTasks()) {
@@ -42,10 +43,12 @@ class SongsDownloader(var adapter: DownloadAdapter? = null,
         }
     }
 
+    // 没有下载任务时调用
     private fun noTasks() {
         recyclerView?.visibility = View.GONE
         textView?.visibility = View.VISIBLE
     }
+
 
     override fun onFail(msg: String) {
         handler.post {

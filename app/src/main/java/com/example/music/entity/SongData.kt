@@ -2,6 +2,10 @@ package com.example.music.entity
 
 import com.example.respository.bean.SongPlayJson
 
+/**
+ * 加载歌曲url所用到的实体类
+ */
+
 class SongData(var id: Long = errorLong,
                var url: String = "",
                var size: Long = errorLong,

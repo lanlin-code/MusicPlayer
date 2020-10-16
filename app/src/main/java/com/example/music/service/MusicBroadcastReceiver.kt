@@ -6,6 +6,10 @@ import android.content.Intent
 import android.widget.RemoteViews
 import com.example.music.util.LogUtil
 
+/**
+ * 通知视图注册的广播
+ */
+
 class MusicBroadcastReceiver(var binder: MyBinder? = null) : BroadcastReceiver() {
 
     companion object {

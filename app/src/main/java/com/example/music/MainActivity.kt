@@ -30,8 +30,8 @@ import com.squareup.picasso.Picasso
 class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener, AutoLoginCallback,
     LoadStatusListener, LoadPlaylistListener, DataObtainListener, SongsListener, ShowUserStatusFragment.LogoutListener {
 
-    private lateinit var currentFragment: Fragment
-    private var user: User = User()
+    private lateinit var currentFragment: Fragment // 记录当前的碎片
+    private var user: User = User() // 用户信息
     private val TAG: String = "MainActivity"
     private var loginSuccessListener: OnLoginSuccessListener? = null
     private var userPlaylists: MutableList<UserPlaylist> = mutableListOf()
@@ -111,6 +111,7 @@ class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener,
         startService()
     }
 
+    // 初始化播放栏
     private fun initPlayBar() {
         playBar = findViewById(R.id.play_bar)
         imageView = findViewById(R.id.play_bar_img)
@@ -136,6 +137,7 @@ class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener,
         popList.setOnClickListener(clickListener)
     }
 
+    // 绑定服务
     private fun startService() {
         val intent = Intent(this, MyService::class.java)
         bindService(intent, connection, Context.BIND_AUTO_CREATE)
@@ -157,6 +159,7 @@ class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener,
         }
     }
 
+    // 更新播放按钮图片
     private fun updateStatus(playing: Boolean) {
         LogUtil.debug(TAG, "playing = $playing")
         if (playing) {
@@ -166,6 +169,7 @@ class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener,
         }
     }
 
+    // 显示播放栏
     private fun showPlayBar() {
         player?.let {
             if (it.showBar()) {
@@ -182,6 +186,7 @@ class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener,
         }
     }
 
+    // 登录成功回调
     override fun onLoginSuccess(data: User) {
         user = data
         this.onBackHome()
@@ -193,10 +198,12 @@ class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener,
         toastErrorMessage(message)
     }
 
+
     private fun toastErrorMessage(message: String) {
         Toast.makeText(this.applicationContext, message, Toast.LENGTH_SHORT).show()
     }
 
+    // 设置主页碎片
     private fun setHome() {
         val h = supportFragmentManager.findFragmentByTag(HomeFragment::class.java.simpleName)
         h?.let {
@@ -283,14 +290,17 @@ class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener,
         toastErrorMessage(message)
     }
 
+    // 获取用户id
     override fun obtainUserId(): Long {
         return user.userId
     }
 
+    // 获取用户头像
     override fun obtainUserAvatar(): String {
         return user.avatar
     }
 
+    // 获取用户名
     override fun obtainUsername(): String {
         return user.nickname
     }
@@ -299,16 +309,19 @@ class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener,
         toastErrorMessage(msg)
     }
 
+    // 获取window对象
     override fun onObtainWindow(): Window {
         return this.window
     }
 
+    // 发送播放列表，显示播放栏
     override fun transmitData(songs: MutableList<Song>) {
         player?.clear()
         playBar.visibility = View.VISIBLE
         playStatus.setImageResource(R.drawable.play)
         player?.receive(songs)
     }
+
 
     override fun playFrom(position: Int) {
         player?.playFrom(position)
@@ -352,6 +365,7 @@ class MainActivity : AppCompatActivity(), LoginCallback, FragmentChangeListener,
         player?.removeSong(song)
     }
 
+    // 退出登录
     override fun logout() {
         user = User()
         val f = getHomeFragment()

@@ -35,6 +35,7 @@ class ResultPresenter(private val searchMessage: SearchMessage) : RequestCallBac
 //        sListener?.show(Song.valueOfResult(data))
     }
 
+    // 拼接歌曲id
     private fun buildIds(json: SearchSongJson): String {
         val builder = StringBuilder()
         json.result?.songs?.let {

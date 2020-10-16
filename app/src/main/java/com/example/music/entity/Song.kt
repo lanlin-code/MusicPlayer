@@ -8,9 +8,12 @@ import com.example.respository.bean.SongDetailJson
 import java.lang.StringBuilder
 
 class Song(
-    var id: Long = errorId, var name: String? = errorString,
-    var albumId: Long = errorId, var albumPic: String? = errorString,
-    var albumName: String? = errorString, var artists: ArrayList<Artist> = arrayListOf()): Parcelable{
+    var id: Long = errorId,  // 歌曲ID
+    var name: String? = errorString, // 歌曲名
+    var albumId: Long = errorId,
+    var albumPic: String? = errorString,
+    var albumName: String? = errorString,
+    var artists: ArrayList<Artist> = arrayListOf()): Parcelable {
 
 //    var artists: MutableList<Artist> = mutableListOf()
 
@@ -73,6 +76,7 @@ class Song(
                 return arrayOfNulls(size)
             }
 
+            // 检查数据是否有误
             fun isError(artist: Artist): Boolean = artist.id == errorId || artist.name == errorString
         }
 
@@ -91,6 +95,7 @@ class Song(
         return 0
     }
 
+    // 拼接歌手名
     fun appendArtists(): String {
         val builder = StringBuilder()
         val size = artists.size
@@ -129,37 +134,6 @@ class Song(
             return r
         }
 
-        fun valueOfResult(json: SearchSongJson): MutableList<Song> {
-            val r = mutableListOf<Song>()
-            val d = json.result?.songs
-            d?.let {
-                for (s in it) {
-                    val song = valueOf(s)
-                    if (song.id != errorId && song.name != errorString) {
-                        r.add(song)
-                    }
-                }
-            }
-            return r
-        }
-
-        private fun valueOf(s: SearchSongJson.Result.Song): Song {
-            val song = Song()
-            s.artists?.let {
-                for (a in it) {
-                    val at = Artist()
-                    a.id?.let { i -> at.id = i }
-                    a.name?.let { n -> at.name = n }
-                    if (!Artist.isError(at)) {
-                        song.artists.add(at)
-                    }
-                }
-            }
-            s.id?.let { song.id = it }
-            s.name?.let { song.name = it }
-            return song
-        }
-
 
         private fun valueOf(s: SongDetailJson.Song): Song {
             val song = Song()
@@ -191,6 +165,7 @@ class Song(
             return song
         }
 
+        // 检查数据是否出错
         private fun isError(song: Song): Boolean = song.id == errorId || song.name == errorString
                 || song.albumId == errorId || song.albumPic == errorString
     }

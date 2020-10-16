@@ -34,9 +34,9 @@ import java.util.*
 
 class HomeFragment: Fragment(), MainActivity.OnLoginSuccessListener, ResponseCallback<Banners> {
     private var listener: FragmentChangeListener? = null
-    private lateinit var avatar: ImageView
-    private var loginSuccess: Boolean = false
-    private lateinit var timer: Timer
+    private lateinit var avatar: ImageView // 显示用户头像
+    private var loginSuccess: Boolean = false // 登录成功的标志
+    private lateinit var timer: Timer // 定时器，用来轮播轮播图
     private lateinit var bannerView: BannerView
     private lateinit var bannerDots: LinearLayout
     private var dotsList: MutableList<ImageView>? = null
@@ -80,6 +80,7 @@ class HomeFragment: Fragment(), MainActivity.OnLoginSuccessListener, ResponseCal
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         avatar = view.findViewById(R.id.avatar_iv)
+        // 如果登录成功，则跳转用户信息界面，否则跳转到登录界面
         avatar.setOnClickListener {
             if (!loginSuccess) {
                 listener?.onFragmentChange(LoginFragment())
@@ -102,6 +103,7 @@ class HomeFragment: Fragment(), MainActivity.OnLoginSuccessListener, ResponseCal
 
     }
 
+    // 初始化轮播图组件
     private fun initBanner() {
         bannerView.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageScrollStateChanged(state: Int) {
@@ -147,6 +149,7 @@ class HomeFragment: Fragment(), MainActivity.OnLoginSuccessListener, ResponseCal
         timer.cancel()
     }
 
+    // 登录成功，显示头像并加载用户歌单
     override fun onSuccess(avatarUrl: String, context: Context) {
         loginSuccess = true
         Picasso.with(context).load(avatarUrl).into(avatar)
@@ -156,9 +159,11 @@ class HomeFragment: Fragment(), MainActivity.OnLoginSuccessListener, ResponseCal
         }
     }
 
+
     override fun onSuccess(data: Banners) {
         val l = data.urlList
         dotsList = mutableListOf()
+        // 小圆点
         context?.let {
             val width = 10
             val height = 10
@@ -177,6 +182,7 @@ class HomeFragment: Fragment(), MainActivity.OnLoginSuccessListener, ResponseCal
             }
         }
         bannerView.adapter = BannerAdapter(l)
+        // 开始轮播
         timer.schedule(object : TimerTask() {
             override fun run() {
                 if (bannerView.loop) {

@@ -1,19 +1,21 @@
 package com.example.music.search.result
 
-import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.Button
+import android.widget.EditText
+import android.widget.ImageButton
+import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.music.BaseFragment
 import com.example.music.R
 import com.example.music.SongsListener
 
-class SearchResultFragment(var searchText: String = "", val hint: String = "") : BaseFragment() {
+class SearchResultFragment(private var searchText: String = "", private val hint: String = "") : BaseFragment() {
 
     private var songsListener: SongsListener? = null
     private val message = SearchMessage()
@@ -88,6 +90,7 @@ class SearchResultFragment(var searchText: String = "", val hint: String = "") :
 
     }
 
+    // 加载查询结果
     private fun load() {
         message.loading = false
         val text = editText.text.toString()

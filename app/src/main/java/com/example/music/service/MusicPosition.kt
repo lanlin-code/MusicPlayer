@@ -16,6 +16,7 @@ class MusicPosition {
     var size: Int = 0
 
 
+    // 下一个位置
     fun nextPosition() {
         when(mode) {
             order -> getOrderNextPosition()
@@ -23,6 +24,7 @@ class MusicPosition {
         }
     }
 
+    // 上一个位置
     fun lastPosition() {
         when(mode) {
             order -> getOrderLastPosition()
@@ -30,6 +32,7 @@ class MusicPosition {
         }
     }
 
+    // order模式下的下一个位置
     private fun getOrderNextPosition() {
         currentPosition ++
         if (currentPosition >= size) {
@@ -38,6 +41,7 @@ class MusicPosition {
         LogUtil.debug(tag, "currentPosition = $currentPosition, size = $size")
     }
 
+    // order模式下的上一个位置
     private fun getOrderLastPosition() {
         currentPosition --
         if (currentPosition < 0) {
@@ -45,6 +49,7 @@ class MusicPosition {
         }
     }
 
+    // random模式下的位置
     private fun getRandomPosition() {
         currentPosition = (Math.random()*size).toInt()
     }

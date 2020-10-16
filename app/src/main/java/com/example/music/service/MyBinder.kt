@@ -35,8 +35,8 @@ class MyBinder(val context: Context,
     private val songList = CopyOnWriteArrayList<Song>()
     private var musicPlayer = MediaPlayer()
     private val musicPosition = MusicPosition()
-    private val callbackList = RemoteCallbackList<IMusicCallback>()
-    private var prepared = false
+    private val callbackList = RemoteCallbackList<IMusicCallback>() // 跨进程回调
+    private var prepared = false // MediaPlayer是否准备的标志
 
 
     init {
@@ -57,7 +57,7 @@ class MyBinder(val context: Context,
             override fun onSuccess(data: MutableList<SongData>) {
                 if (data.size <= 0) {
                     Toast.makeText(context.applicationContext, "加载失败", Toast.LENGTH_SHORT).show()
-//                    next()
+                    if (songList.size > 1) next()
                 }
                 var position = -1
                 for (d in data) {
@@ -70,7 +70,6 @@ class MyBinder(val context: Context,
                         }
                     }
                 }
-//                LogUtil.debug(tag, "currentPosition = ${musicPosition.currentPosition}, position = $position")
                 if (position >= 0) {
                     play(position)
 
@@ -86,15 +85,16 @@ class MyBinder(val context: Context,
     }
 
 
+    // 清空播放列表
     override fun clear() {
         musicPlayer.reset()
         songList.clear()
         musicPosition.size = 0
         musicPosition.currentPosition = 0
-
         notifySongsNull()
     }
 
+    // 暂停播放
     override fun parse() {
         if (musicPlayer.isPlaying && prepared) {
             musicPlayer.pause()
@@ -103,42 +103,52 @@ class MyBinder(val context: Context,
         }
     }
 
+    // 跳转到选择位置播放
     override fun seekTo(position: Int) {
         musicPlayer.seekTo(position)
     }
 
+    // 设置回调
     override fun registerCallback(callback: IMusicCallback?) {
         callback?.let { callbackList.register(callback) }
     }
 
+    // 取消回调
     override fun unregisterCallback(callback: IMusicCallback?) {
         callback?.let { callbackList.unregister(callback) }
     }
 
+    // 更改播放模式
     override fun mode(mode: Int) {
         musicPosition.mode = mode
     }
 
+    // 是否正在播放
     override fun isPlaying(): Boolean {
         return musicPlayer.isPlaying
     }
 
+    // 获取当前播放歌曲
     override fun currentPlaying(): Song {
         return songList[musicPosition.currentPosition]
     }
 
+    // 是否应该显示播放栏
     override fun showBar(): Boolean {
         return songList.size > 0
     }
 
+    // 获取播放模式
     override fun getMode(): Int {
         return musicPosition.mode
     }
 
+    // 是否更新视图
     override fun updateLayout(position: Int): Boolean {
         return musicPosition.currentPosition == position
     }
 
+    // 添加到下一首播放
     override fun addSong(song: Song?) {
         song?.let {
             val e = exist(it)
@@ -148,7 +158,7 @@ class MyBinder(val context: Context,
                     songList.add(musicPosition.currentPosition + 1, s)
                 }
             } else {
-                songList.add(it)
+                songList.add(musicPosition.currentPosition + 1, it)
                 musicPosition.size = songList.size
             }
             if (songList.size == 1) {
@@ -158,6 +168,7 @@ class MyBinder(val context: Context,
         }
     }
 
+    // 移除歌曲
     override fun removeSong(song: Song?) {
         song?.let {
             val e = exist(it)
@@ -178,6 +189,7 @@ class MyBinder(val context: Context,
         }
     }
 
+    // 添加并播放歌曲
     override fun addAndPlay(song: Song?) {
         song?.let {
             val e = exist(it)
@@ -190,19 +202,23 @@ class MyBinder(val context: Context,
         }
     }
 
+    // 获取播放列表
     override fun obtainData(): MutableList<Song> {
         return songList
     }
 
+    // 播放器是否准备
     override fun isPrepared(): Boolean {
         return prepared
     }
 
+    // 下一曲
     override fun next() {
         musicPosition.nextPosition()
         prepareToPlay(musicPosition.currentPosition)
     }
 
+    // 当前播放时间
     override fun currentPosition(): Int {
         return if (prepared) {
             musicPlayer.currentPosition
@@ -211,6 +227,7 @@ class MyBinder(val context: Context,
         }
     }
 
+    // 总时长
     override fun duration(): Int {
 
         return if (prepared) {
@@ -221,16 +238,19 @@ class MyBinder(val context: Context,
 
     }
 
+    // 从某一项开始播放
     override fun playFrom(position: Int) {
         musicPosition.currentPosition = position
         prepareToPlay(musicPosition.currentPosition)
     }
 
+    // 上一曲
     override fun last() {
         musicPosition.lastPosition()
         prepareToPlay(musicPosition.currentPosition)
     }
 
+    // 接收播放列表
     override fun receive(songs: MutableList<Song>?) {
         musicPlayer.reset()
         songList.clear()
@@ -243,6 +263,7 @@ class MyBinder(val context: Context,
         }
     }
 
+    // 恢复播放
     override fun restart() {
         if (!musicPlayer.isPlaying && prepared) {
             musicPlayer.start()
@@ -252,6 +273,7 @@ class MyBinder(val context: Context,
 
     }
 
+    // 清除所有回调
     override fun clearAllCallback() {
         val count = callbackList.beginBroadcast()
         for (i in 0 until count) {
@@ -261,6 +283,7 @@ class MyBinder(val context: Context,
         callbackList.finishBroadcast()
     }
 
+    // 检查播放列表是否存在该歌曲
     private fun exist(song: Song): Int {
         var position = -1
         val size = songList.size
@@ -274,6 +297,7 @@ class MyBinder(val context: Context,
         return position
     }
 
+    // 检查歌曲url，为空则加载，否则播放
     private fun prepareToPlay(position: Int) {
         if (position != musicPosition.currentPosition) return
         val song = songList[musicPosition.currentPosition]
@@ -285,6 +309,7 @@ class MyBinder(val context: Context,
         }
     }
 
+    // 播放歌曲
     private fun play(position: Int) {
 
         if (position != musicPosition.currentPosition) return
@@ -293,7 +318,6 @@ class MyBinder(val context: Context,
 //        LogUtil.debug(tag, "name = ${song.name}, url = ${song.url}, id = ${song.id}")
 
         if (song.errorUrl()) {
-            LogUtil.error(tag, "error")
             next()
         } else {
 
@@ -305,8 +329,6 @@ class MyBinder(val context: Context,
                 musicNotification?.onUpdate(song, true)
 
             } catch (e: Exception) {
-                LogUtil.error(tag, "Music Exception")
-                Log.d(tag, e.message, e)
                 next()
             }
 
@@ -314,6 +336,7 @@ class MyBinder(val context: Context,
 
     }
 
+    // 播放列表空时调用
     private fun notifySongsNull() {
         musicNotification?.disappear()
         val count = callbackList.beginBroadcast()
@@ -323,6 +346,7 @@ class MyBinder(val context: Context,
         callbackList.finishBroadcast()
     }
 
+    // 播放歌曲变化时调用
     private fun notifySongChange(song: Song) {
         val count = callbackList.beginBroadcast()
         val position = songList.indexOf(song)
@@ -331,13 +355,13 @@ class MyBinder(val context: Context,
             callback.getCurrentSong(song.albumPic, song.name)
             callback.playCallback(position)
             callback.obtainLrc(song.id)
+            callback.playStatusChange(true)
         }
         callbackList.finishBroadcast()
 
     }
 
-
-
+    // 播放状态变化时调用
     private fun notifyPlayStatusChange(playing: Boolean) {
 
         val c = callbackList.beginBroadcast()
@@ -348,7 +372,7 @@ class MyBinder(val context: Context,
         callbackList.finishBroadcast()
     }
 
-
+    // 加载url
     private fun loadUrl() {
         model.getSongUrl(songList[musicPosition.currentPosition].id, presenter)
     }

@@ -61,6 +61,7 @@ class MusicNotification(val context: Context,
 
     fun isShow() = !disappear
 
+    // 更新视图
     fun onUpdate(song: Song, isPlaying: Boolean) {
         handler.post {
             remoteViews?.setTextViewText(R.id.notification_name, song.name)
@@ -70,27 +71,9 @@ class MusicNotification(val context: Context,
         }
 
 
-
-//        val target = object : SimpleTarget<Bitmap>() {
-//            override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-//                LogUtil.debug(tag, "current thread is ${Thread.currentThread().name}")
-//                remoteViews?.setImageViewBitmap(R.id.notification_image, resource)
-//                updateState(isPlaying)
-//
-//            }
-//
-//        }
-//
-//        Glide.with(context).asBitmap().load(song.albumPic).into(target)
-
-
-
-
-
-
-
     }
 
+    // 更新播放图片
     fun updateState(isPlaying: Boolean) {
         if (isPlaying) {
             remoteViews?.setImageViewResource(R.id.notification_play_status, R.drawable.play_32)
@@ -105,23 +88,6 @@ class MusicNotification(val context: Context,
         LogUtil.debug(tag, "send message")
         LogUtil.debug(tag, "manager is null? ${manager == null}")
         disappear = false
-
-//        val builder = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-//            val channelId = "music"
-//            val channelName = "music_channel"
-//            val channel = NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_DEFAULT)
-//            manager?.createNotificationChannel(channel)
-//            NotificationCompat.Builder(context, channelId)
-//        } else {
-//            NotificationCompat.Builder(context)
-//        }
-
-
-
-//        val notification = builder.setSmallIcon(R.drawable.ic_launcher_foreground)
-//            .setCustomContentView(remoteViews).setPriority(NotificationCompat.PRIORITY_HIGH).build()
-//        notification.flags = Notification.FLAG_ONGOING_EVENT
-
 
         manager?.notify(nid, notification)
 

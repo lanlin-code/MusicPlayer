@@ -18,6 +18,7 @@ class LoginFragment : BaseFragment(), ResponseCallback<User> {
     private var listener: LoginCallback? = null
     private var phone: EditText? = null
     private var password: EditText? = null
+    private var loading = false
 //    private var fragmentChangeListener: FragmentChangeListener? = null
 
     private val presenter = LoginPresenter()
@@ -37,7 +38,13 @@ class LoginFragment : BaseFragment(), ResponseCallback<User> {
         password = view.findViewById(R.id.password_text)
         presenter.listener = this
         val b = view.findViewById<Button>(R.id.login_button)
-        b.setOnClickListener { model.login(presenter, phone?.text.toString(), password?.text.toString()) }
+        b.setOnClickListener {
+            if (!loading) {
+                loading = true
+                model.login(presenter, phone?.text.toString(), password?.text.toString())
+            }
+
+        }
         val back = view.findViewById<ImageButton>(R.id.login_back_button)
         back.setOnClickListener { fragmentChangeListener?.onBackHome() }
     }
@@ -47,9 +54,6 @@ class LoginFragment : BaseFragment(), ResponseCallback<User> {
         if (context is LoginCallback) {
             listener = context
         }
-//        if (context is FragmentChangeListener) {
-//            fragmentChangeListener = context
-//        }
 
     }
 
@@ -60,10 +64,12 @@ class LoginFragment : BaseFragment(), ResponseCallback<User> {
 
 
     override fun onSuccess(data: User) {
+        loading = false
         listener?.onLoginSuccess(data)
     }
 
     override fun onError(message: String) {
+        loading = false
         listener?.onLoginFail(message)
     }
 

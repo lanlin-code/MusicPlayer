@@ -8,6 +8,7 @@ import com.example.music.entity.UserPlaylist
 
 class PlaylistShow(val view: RecyclerView, var listener: FragmentChangeListener?): ShowDataListener<MutableList<UserPlaylist>> {
 
+    // 更新视图
     override fun show(data: MutableList<UserPlaylist>) {
         view.visibility = View.VISIBLE
         val adapter = UserPlaylistAdapter(data)

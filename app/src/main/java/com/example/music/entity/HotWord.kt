@@ -6,9 +6,9 @@ import com.example.respository.bean.HotList
  * 搜索热词
  */
 
-class HotWord(var searchWord: String = ERROR_STRING,
-              var score: Long = ERROR_LONG,
-              var content: String = ERROR_STRING,
+class HotWord(var searchWord: String = ERROR_STRING, // 搜索词
+              var score: Long = ERROR_LONG, // 搜索次数
+              var content: String = ERROR_STRING, // 显示内容
               var iconUrl: String = ERROR_STRING) {
 
 

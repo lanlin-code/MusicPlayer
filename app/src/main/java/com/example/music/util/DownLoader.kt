@@ -18,17 +18,17 @@ import java.util.*
 import java.util.concurrent.LinkedBlockingQueue
 
 object DownLoader {
-    private val list = Collections.synchronizedList(mutableListOf<Song>())
-    private val status = Collections.synchronizedList(mutableListOf<Int>())
+    private val list = Collections.synchronizedList(mutableListOf<Song>()) // 下载任务列表
+    private val status = Collections.synchronizedList(mutableListOf<Int>()) // 下载状态
     private val client = OkHttpClient()
-    private const val MAX_SIZE = 8
-    var cacheDir: File? = null
+    private const val MAX_SIZE = 8 // 下载任务列表最大数量
+    var cacheDir: File? = null // 缓存路径
     var listener: DownloadListener? = null
-    private val cacheList = mutableListOf<Song>()
+    private val cacheList = mutableListOf<Song>() // 缓冲区
     private val error = "网络不佳"
-    private val start = 1
-    private val pause = 2
-    private val delete = 3
+    private val start = 1 // 正在下载
+    private val pause = 2 //  暂停下载
+    private val delete = 3 // 删除下载任务
     private val tag = "DownLoader"
     private val model = SongModel()
     private val presenter = SongPresenter()
@@ -40,7 +40,6 @@ object DownLoader {
                 for (d in data) {
                     if (d.error()) {
                         Toast.makeText(MusicApplication.context, failString, Toast.LENGTH_SHORT).show()
-
                         break
                     }
                     for (s in cacheList) {
@@ -61,24 +60,20 @@ object DownLoader {
         }
     }
 
-
+    // 添加下载任务
     fun addTask(song: Song) {
-//        val failString = "添加下载任务失败"
         val successString = "添加下载任务成功"
-//        val existString = "任务已存在或完成"
-
         LogUtil.debug(tag, "$cacheDir")
-
-
         if (list.size >= MAX_SIZE || cacheDir == null) {
-//            listener?.callback(failString)
             Toast.makeText(MusicApplication.context, failString, Toast.LENGTH_SHORT).show()
         } else {
+            // 如果URL错误，加载
             if (song.errorUrl()) {
                 model.getSongUrl(song.id, presenter)
-                cacheList.add(song)
+                if (!exist(song)) cacheList.add(song)
                 return
             }
+            // 文件名存在，删除它
             song.name?.let {
                 if (checkFile(it)) {
                     val f = File("$cacheDir/$it.mp3")
@@ -88,25 +83,39 @@ object DownLoader {
 
             list.add(song)
             status.add(pause)
+            // 如果只有一个下载任务，开始下载
             if (list.size == 1) {
                 startTask(0)
             }
-//            listener?.callback(successString)
             Toast.makeText(MusicApplication.context, successString, Toast.LENGTH_SHORT).show()
 
         }
     }
 
+    // 检查cacheList是否存在该歌曲
+    private fun exist(song: Song): Boolean {
+        var e = false
+        for (c in cacheList) {
+            if (c.id == song.id) {
+                e = true
+                break
+            }
+        }
+        return e
+    }
 
-
+    // 是否存在下载任务
     fun hasTasks() = list.size > 0
 
+    // 第position+1个任务是否开始
     fun taskIsStarted(position: Int) = status[position] == start
 
+    // 得到下载歌曲
     fun getDownloadData(): MutableList<Song> {
         return list
     }
 
+    // 删除任务
     fun deleteTask(position: Int) {
         if (status[position] != start) {
             list[position].name?.let {
@@ -122,12 +131,12 @@ object DownLoader {
         } else status[position] = delete
     }
 
-
-
+    // 暂停下载
     fun pauseTask(position: Int) {
         status[position] = pause
     }
 
+    // 恢复下载
     fun restartTask(position: Int) {
         if (cacheDir != null) {
             status[position] = start
@@ -171,12 +180,14 @@ object DownLoader {
                                             var fileTotal = 0
                                             while (perLen != -1) {
                                                 if (status[position] == pause) {
+                                                    save.close()
                                                     it1.close()
                                                     listener?.onPause(position)
                                                     return
                                                 } else if (status[position] == delete){
                                                     list.removeAt(position)
                                                     status.removeAt(position)
+                                                    save.close()
                                                     it1.close()
                                                     f.delete()
                                                     listener?.onDelete(position)
@@ -215,11 +226,13 @@ object DownLoader {
         }
     }
 
+    // 检查文件是否存在
     private fun checkFile(name: String): Boolean {
         val f = File("$cacheDir/$name.mp3")
         return f.exists()
     }
 
+    // 开始下载
     private fun startTask(position: Int) {
         if (cacheDir != null) {
             val task = list[position]

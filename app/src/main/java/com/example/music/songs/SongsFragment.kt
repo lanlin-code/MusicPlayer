@@ -94,6 +94,7 @@ class SongsFragment(private var playlist: UserPlaylist? = null): BaseFragment() 
         back.setOnClickListener { fragmentChangeListener?.onBackHome() }
     }
 
+    // 显示歌单封面图片和歌单名
     private fun initPlaylistMessage(view: View) {
         val listPic = view.findViewById<ImageView>(R.id.songs_list_pic)
         playlist?.imgUrl?.let {
@@ -104,6 +105,7 @@ class SongsFragment(private var playlist: UserPlaylist? = null): BaseFragment() 
         playlist?.name?.let { listName.text = it }
     }
 
+    // 显示用户头像和用户名
     private fun initUserMessage(view: View) {
         val avatar = view.findViewById<ImageView>(R.id.songs_user_pic)
         dataObtainListener?.obtainUserAvatar()?.let {

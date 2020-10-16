@@ -1,8 +1,10 @@
 package com.example.music.entity
 
-import android.os.Parcel
-import android.os.Parcelable
 import com.example.respository.bean.UserPlayListJson
+
+/**
+ * 用户歌单的实体类
+ */
 
 class UserPlaylist(var id: Long = errorId, var name: String = emptyMessage, var imgUrl: String = emptyMessage) {
     companion object {

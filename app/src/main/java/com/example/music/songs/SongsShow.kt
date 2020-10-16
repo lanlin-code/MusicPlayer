@@ -31,6 +31,7 @@ class SongsShow(var outerRecyclerview: OuterRecyclerview? = null,
         }
     }
 
+    // 获取所有歌曲
     private fun getSongs(map: MutableMap<String, MutableList<Song>>, title: MutableList<String>): MutableList<Song> {
         val songs = mutableListOf<Song>()
         for (t in title) {
@@ -42,6 +43,7 @@ class SongsShow(var outerRecyclerview: OuterRecyclerview? = null,
         return songs
     }
 
+    // 将歌曲按照首字母分组
     private fun getData(songs: MutableList<Song>): MutableMap<String, MutableList<Song>> {
         val map = mutableMapOf<String, MutableList<Song>>()
         for (s in songs) {

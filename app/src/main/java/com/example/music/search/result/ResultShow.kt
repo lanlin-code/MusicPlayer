@@ -11,8 +11,8 @@ import com.example.music.util.LogUtil
 
 class ResultShow(var recyclerView: RecyclerView? = null,
                  val message: SearchMessage,
-                 var resultButton: Button? = null,
-                 var textView: TextView? = null,
+                 var resultButton: Button? = null, // 加载按钮
+                 var textView: TextView? = null, // 占位图
                  var songsListener: SongsListener? = null) : ShowDataListener<MutableList<Song>> {
     override fun show(data: MutableList<Song>) {
         textView?.visibility = View.GONE
@@ -27,14 +27,6 @@ class ResultShow(var recyclerView: RecyclerView? = null,
             if (it.adapter is ResultAdapter) {
                 (it.adapter as ResultAdapter).data.addAll(data)
                 (it.adapter as ResultAdapter).notifyDataSetChanged()
-//                val list = (it.adapter as ResultAdapter).data
-//                val resultAdapter = ResultAdapter(listener = songsListener)
-//                resultAdapter.data.addAll(list)
-//                resultAdapter.data.addAll(data)
-//                resultAdapter.listener = songsListener
-//                (it.adapter as ResultAdapter).listener = null
-//                it.adapter = resultAdapter
-//                (it.adapter as ResultAdapter).notifyDataSetChanged()
             }
         }
         recyclerView?.visibility = View.VISIBLE

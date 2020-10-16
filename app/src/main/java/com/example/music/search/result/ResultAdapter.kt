@@ -19,9 +19,9 @@ class ResultAdapter(var listener: SongsListener? = null,
                     var data: MutableList<Song> = mutableListOf()) : RecyclerView.Adapter<ResultAdapter.ResultHolder>() {
 
     class ResultHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
-        val name = itemView.findViewById<TextView>(R.id.result_name)
-        val artist = itemView.findViewById<TextView>(R.id.result_artist)
-        val more = itemView.findViewById<ImageButton>(R.id.result_more)
+        val name = itemView.findViewById<TextView>(R.id.result_name) // 歌名
+        val artist = itemView.findViewById<TextView>(R.id.result_artist) // 歌手
+        val more = itemView.findViewById<ImageButton>(R.id.result_more) // 弹窗按钮
 
     }
 

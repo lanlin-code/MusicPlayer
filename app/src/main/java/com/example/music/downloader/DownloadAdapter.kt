@@ -47,6 +47,7 @@ class DownloadAdapter : RecyclerView.Adapter<DownloadAdapter.DownloadHolder>() {
             holder.name.text = item.name
         }
 
+        // 如果视图显示的下载任务已开始，则隐藏clickText,显示layout
         if (DownLoader.taskIsStarted(position)) {
             holder.clickText.visibility = View.GONE
             holder.layout.visibility = View.VISIBLE

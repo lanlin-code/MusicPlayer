@@ -28,21 +28,21 @@ class SongPlayFragment(var player: IMusicPlayer? = null): BaseFragment() {
 
     private val TAG = "SongPlayFragment"
     private var songsListener: SongsListener? = null
-    private lateinit var layout: MyLayout
-    private lateinit var name: TextView
-    private lateinit var artist: TextView
-    private lateinit var songImg: RoundAnimationImageView
-    private lateinit var currentTime: TextView
-    private lateinit var seekBar: SeekBar
-    private lateinit var duration: TextView
-    private lateinit var playState: ImageButton
-    private lateinit var playMode: ImageButton
-    private lateinit var lrcView: LrcView
+    private lateinit var layout: MyLayout // 歌词背景
+    private lateinit var name: TextView // 歌名
+    private lateinit var artist: TextView // 歌手
+    private lateinit var songImg: RoundAnimationImageView // 歌曲图片
+    private lateinit var currentTime: TextView // 当前播放时间
+    private lateinit var seekBar: SeekBar // 进度条
+    private lateinit var duration: TextView // 总时长
+    private lateinit var playState: ImageButton // 播放或暂停
+    private lateinit var playMode: ImageButton // 播放模式
+    private lateinit var lrcView: LrcView // 歌词
     private val presenter = SongPlayPresenter()
     private val model = SongPlayModel()
     private val playCallback = SongPlayCallback()
     private val dragListener = LrcDrag()
-    private var drag = false
+    private var drag = false // 是否拖动
     private lateinit var clickListener: PopOnClickListener
     private val timerPeriod = 100L
     private var timer = Timer()
@@ -80,8 +80,9 @@ class SongPlayFragment(var player: IMusicPlayer? = null): BaseFragment() {
 
 
     }
+    // 时间文本格式
     private val format = SimpleDateFormat.getDateInstance() as SimpleDateFormat
-    private var currentMode = MusicPosition.order
+    private var currentMode = MusicPosition.order // 当前播放模式
 
 
     init {
@@ -125,6 +126,7 @@ class SongPlayFragment(var player: IMusicPlayer? = null): BaseFragment() {
         artist = view.findViewById(R.id.play_artist)
         songImg = view.findViewById(R.id.play_image)
         songImg.rotation = true
+        // 如果正在播放歌曲，则播放动画，否则暂停动画
         player?.let {
             if (it.isPlaying) {
                 songImg.resumeAnimation()
@@ -133,7 +135,6 @@ class SongPlayFragment(var player: IMusicPlayer? = null): BaseFragment() {
             }
         }
 
-//        songImg.start = true
         currentTime = view.findViewById(R.id.play_current_time)
         seekBar = view.findViewById(R.id.play_seek_bar)
         duration = view.findViewById(R.id.play_duration)
@@ -142,14 +143,15 @@ class SongPlayFragment(var player: IMusicPlayer? = null): BaseFragment() {
         val centerLayout = view.findViewById<RelativeLayout>(R.id.play_center_layout)
         val touchPlay = view.findViewById<ImageButton>(R.id.play_lrc_play)
         val timeText = view.findViewById<TextView>(R.id.play_lrc_time)
+        // 歌词界面和歌词图片的转换
         centerLayout.setOnClickListener {
             if (songImg.visibility == View.VISIBLE) {
-//                songImg.clearAnimation()
+
                 songImg.pauseAnimation()
                 songImg.visibility = View.GONE
                 lrcView.visibility = View.VISIBLE
             } else {
-//                songImg.startAnimation()
+
                 songImg.resumeAnimation()
                 songImg.visibility = View.VISIBLE
                 lrcView.visibility = View.GONE
@@ -158,6 +160,7 @@ class SongPlayFragment(var player: IMusicPlayer? = null): BaseFragment() {
 
             }
         }
+        // 从选择时间开始播放
         touchPlay.setOnClickListener {
             val t = lrcView.getCurrentTime()
             touchPlay.visibility = View.GONE
@@ -187,12 +190,14 @@ class SongPlayFragment(var player: IMusicPlayer? = null): BaseFragment() {
 
     }
 
+    // 初始化播放模式按钮
     private fun initButtonMode() {
         player?.let {
             currentMode = it.mode
             updateButtonMode()
         }
 
+        // 更改播放模式
         playMode.setOnClickListener {
             currentMode = (currentMode + 1) % MusicPosition.modeSize
             updateButtonMode()
@@ -200,6 +205,7 @@ class SongPlayFragment(var player: IMusicPlayer? = null): BaseFragment() {
         }
     }
 
+    // 初始化播放按钮
     private fun initButtonState() {
         player?.let { updateButtonState(it.isPlaying) }
         playState.setOnClickListener {
@@ -237,6 +243,7 @@ class SongPlayFragment(var player: IMusicPlayer? = null): BaseFragment() {
         }
     }
 
+    // 初始化进度条
     private fun initSeekBar() {
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
@@ -275,6 +282,7 @@ class SongPlayFragment(var player: IMusicPlayer? = null): BaseFragment() {
         }, 0L, timerPeriod)
     }
 
+    // 加载歌词
     private fun getLrc() {
         val s = player?.currentPlaying()
         s?.let {
@@ -285,6 +293,7 @@ class SongPlayFragment(var player: IMusicPlayer? = null): BaseFragment() {
     private fun updateLayout() {
         try {
             val s = player?.currentPlaying()
+            // 设置背景
             s?.let {
                 Glide.with(this).load(it.albumPic).apply(RequestOptions.bitmapTransform(
                     BlurTransformation(25, 25)
